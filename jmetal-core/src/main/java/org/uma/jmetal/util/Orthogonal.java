@@ -7,17 +7,10 @@ public class Orthogonal{
 	private static int F; //维度数
 	private static int basecolumns; //基本列
 	private static int columns;  //最终列数
-	private static int rows;
+	private static int rows; //行数
 	
 	public static int [][] getOrthogoanlTable(){
-		int J; //基本列
-		for(J = 0;;J++){
-			if(Math.pow(getQ(), J)/(getQ()-1)>=getF()){
-				setBasecolumns(J);
-				break;
-			}
-			
-		}
+		
 		int [][] res = new int[getRows()+1][getRows()+1];
 		
 		if((int)Math.pow(getQ(),getBasecolumns()) == getF()){
@@ -56,19 +49,19 @@ public class Orthogonal{
 		}
 		return tmp;	
 	}
-//	public static void main(String args[]){
-//		//Orthogonal tmp = new Orthogonal();
-//		Orthogonal.setF(4);
-//		Orthogonal.setQ(3);
-//		System.out.println("rows"+Orthogonal.getRows());
-//		int [][] a= Orthogonal.getOrthogoanlTable();
-//		for(int i =0;i<a.length;i++){
-//			for(int j = 0;j<a[0].length;j++){
-//				System.out.print(a[i][j]+",");
-//			}
-//			System.out.println();
-//		}
-//	}
+	public static void main(String args[]){
+		
+		Orthogonal.setF(4);
+		Orthogonal.setQ(3);
+		System.out.println("rows"+Orthogonal.getRows());
+		int [][] a= Orthogonal.getOrthogoanlTable();
+		for(int i =0;i<a.length;i++){
+			for(int j = 0;j<a[0].length;j++){
+				System.out.print(a[i][j]+",");
+			}
+			System.out.println();
+		}
+	}
 
 	public static int getQ() {
 		return Q;
