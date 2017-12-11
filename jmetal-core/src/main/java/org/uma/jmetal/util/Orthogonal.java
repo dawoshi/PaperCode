@@ -8,6 +8,7 @@ public class Orthogonal{
 	private static int basecolumns; //基本列
 	private static int columns;  //最终列数
 	private static int rows; //行数
+	private static double threshold;
 	
 	public static int [][] getOrthogoanlTable(){
 		
@@ -51,7 +52,7 @@ public class Orthogonal{
 	}
 	public static void main(String args[]){
 		
-		Orthogonal.setF(4);
+		Orthogonal.setF(1);
 		Orthogonal.setQ(3);
 		System.out.println("rows"+Orthogonal.getRows());
 		int [][] a= Orthogonal.getOrthogoanlTable();
@@ -107,7 +108,11 @@ public class Orthogonal{
 		}
 		return (int)Math.pow(getQ(), getBasecolumns());
 	}
-	
-	
+	public static double getThreshold() {
+		return threshold;
+	}
+	public static void setThreshold(double threshold) {
+		Orthogonal.threshold = threshold;
+	}
 
 }

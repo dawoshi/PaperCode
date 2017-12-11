@@ -14,7 +14,7 @@ import java.util.List;
 
 /**
  * 
- * @author William
+ * @author William.guo <guoxinian@aliyun.com>
  *
  */
 
@@ -124,31 +124,99 @@ public class SMOCrossover implements CrossoverOperator<DoubleSolution>{
 	        
 	        //up-low数组离散化
 	        double[][] disArray = new double[Orthogonal.getQ()][parent1.getNumberOfVariables()];
+	       
 	        for (int i = 0; i < parent1.getNumberOfVariables(); i++) {
-	        	for(int j = 1;j<=Orthogonal.getQ();j++){
-	        		if(j ==1){
-	        			disArray[i][j] = low[i]; 
-	        		}else if(j>1&&j<Orthogonal.getQ()){
-	        			disArray[i][j] = low[i]+(j-1)*((up[i]-low[i])/(Orthogonal.getQ()-1));
+	        	for(int j = 0;j<Orthogonal.getQ();j++){
+	        		if(j ==0){
+	        			disArray[j][i] = low[i]; 
+	        		}else if(j>0&&j<(Orthogonal.getQ()-1)){
+	        			disArray[j][i] = low[i]+j*((up[i]-low[i])/(Orthogonal.getQ()-1));
 	        		}else{
-	        			disArray[i][j] = up[i];
+	        			disArray[j][i] = up[i];
 	        		}
 	        	}
 	        }
+ 
+	        //获取大于阈值的维度数
+	        int count = 0;
+	        boolean[] status = new boolean[parent1.getNumberOfVariables()];
+	        List<Integer> recordTrue = new ArrayList<Integer>();
+	        List<Integer> recordFalse = new ArrayList<Integer>();
 	        
-	        //离散化矩阵和正交表映射
-	        double[][] maptable = new double[Orthogonal.getColumns()][];
-	        for(int i= 0;i<parent1.getNumberOfVariables();i++){
-	        	int j =1;
+	        for(int i=0;i<parent1.getNumberOfVariables();i++){
+	        	if(Math.abs(up[i]-low[i])> Orthogonal.getThreshold()){
+	        		count++;
+	        		status[i] = true;
+	        		recordTrue.add(i);
+	        	}else{
+	        		status[i] = false;
+	        		recordFalse.add(i);
+	        	}
 	        }
 	        
 	        
 	        
+	        //离散化矩阵和正交表映射
+	        Orthogonal.setF(count);
+	        int [][] orthogonaltable = Orthogonal.getOrthogoanlTable();
+	        	        
+	        double[][] maptable = new double[Orthogonal.getRows()][parent1.getNumberOfVariables()];
+	       
+	        //大于阈值的列进行填充
+	        for(int j=0;j<count;j++){
+	        	int col = recordTrue.get(j);
+	        	for(int i = 0;i<Orthogonal.getRows();i++){
+	        		maptable[i][col] = disArray[orthogonaltable[i][j]-1][col];
+	        	}
+	        }
+	        
+	        //小于阈值的列进行填充
 	        
 	        
 	        
 	        
 	        
+	    	for (int i = 1; i <= my_pow(q, Selec_j(q, count)); i++)//映射正交没有选中的几列
+	    	{
+	    		for (int j = 1; j <= f; j++)//count是根据阈值新生成的数组的大小
+	    		{
+	    			if (status[j] == false)
+	    			{
+	    				int t1 = j - 1;
+	    				while (t1 >= 1 && status[t1] != true)
+	    				{
+	    					t1--;
+	    				}
+	    				if (t1 < 1)//左边找不到往右找
+	    				{
+	    					int t2 = j + 1;
+	    					while (status[t2] != true)
+	    					{
+	    						t2++;
+	    					}
+	    					if (status[t2] == true)
+	    					{
+	    						int temp21 = record_statue[t2];//取出status列 对应的正交表的列
+	    						int temp22 = pop[temp21].col_length[i];//取出正交表中对应的离散化矩阵的位置
+	    						out_array[j].col_length[i] = value_arry[j].col_length[temp22];
+	    					}
+	    				}
+	    				else//左边找到
+	    				{
+	    					int temp31 = record_statue[t1];
+	    					int temp32 = pop[temp31].col_length[i];//取出正交表中对应的离散化矩阵的位置
+	    					out_array[j].col_length[i] = value_arry[j].col_length[temp32];
+	    				}
+	    			}//
+	    		}
+	    	}
+	        
+	        
+	        
+	        
+	        
+	        
+	         
 //	        
 //	        if (randomGenerator.getRandomValue() <= 0.5) {
 //	          if (Math.abs(valueX1 - valueX2) > EPS) {
@@ -204,8 +272,7 @@ public class SMOCrossover implements CrossoverOperator<DoubleSolution>{
 //	        } else {
 //	          offspring.get(0).setVariableValue(i, valueX1);
 //	          offspring.get(1).setVariableValue(i, valueX2);
-//	        }
-	  
+//	        }	  
 	    }
 
 	    return offspring;
