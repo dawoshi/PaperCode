@@ -1,6 +1,7 @@
 package org.uma.jmetal.operator.impl.crossover;
 
 import org.uma.jmetal.operator.CrossoverOperator;
+import org.uma.jmetal.problem.Problem;
 import org.uma.jmetal.solution.DoubleSolution;
 import org.uma.jmetal.solution.util.RepairDoubleSolution;
 import org.uma.jmetal.solution.util.RepairDoubleSolutionAtBounds;
@@ -10,7 +11,9 @@ import org.uma.jmetal.util.pseudorandom.RandomGenerator;
 import org.uma.jmetal.util.Orthogonal;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -25,26 +28,26 @@ public class SMOCrossover implements CrossoverOperator<DoubleSolution>{
 	  private double distributionIndex ;
 	  private double crossoverProbability  ;  //交叉率
 	  private RepairDoubleSolution solutionRepair ;
-
+	  private Problem<DoubleSolution> problem;
 	  private RandomGenerator<Double> randomGenerator ;
 
 	  /** Constructor */
-	  public SMOCrossover(double crossoverProbability, double distributionIndex) {
-	    this (crossoverProbability, distributionIndex, new RepairDoubleSolutionAtBounds()) ;
+	  public SMOCrossover(double crossoverProbability, double distributionIndex,Problem<DoubleSolution> problem) {
+	    this (crossoverProbability, distributionIndex, new RepairDoubleSolutionAtBounds(),problem) ;
 	  }
 
 	  /** Constructor */
-	  public SMOCrossover(double crossoverProbability, double distributionIndex, RandomGenerator<Double> randomGenerator) {
-	    this (crossoverProbability, distributionIndex, new RepairDoubleSolutionAtBounds(), randomGenerator) ;
+	  public SMOCrossover(double crossoverProbability, double distributionIndex, RandomGenerator<Double> randomGenerator,Problem<DoubleSolution> problem) {
+	    this (crossoverProbability, distributionIndex, new RepairDoubleSolutionAtBounds(),problem) ;
 	  }
 
 	  /** Constructor */
-	  public SMOCrossover(double crossoverProbability, double distributionIndex, RepairDoubleSolution solutionRepair) {
-		  this(crossoverProbability, distributionIndex, solutionRepair, () -> JMetalRandom.getInstance().nextDouble());
+	  public SMOCrossover(double crossoverProbability, double distributionIndex, RepairDoubleSolution solutionRepair,Problem<DoubleSolution> problem) {
+		  this(crossoverProbability, distributionIndex, solutionRepair, () -> JMetalRandom.getInstance().nextDouble(),problem);
 	  }
 
 	  /** Constructor */
-	  public SMOCrossover(double crossoverProbability, double distributionIndex, RepairDoubleSolution solutionRepair, RandomGenerator<Double> randomGenerator) {
+	  public SMOCrossover(double crossoverProbability, double distributionIndex, RepairDoubleSolution solutionRepair, RandomGenerator<Double> randomGenerator,Problem<DoubleSolution> problem) {
 	    if (crossoverProbability < 0) {
 	      throw new JMetalException("Crossover probability is negative: " + crossoverProbability) ;
 	    } else if (distributionIndex < 0) {
@@ -54,8 +57,8 @@ public class SMOCrossover implements CrossoverOperator<DoubleSolution>{
 	    this.crossoverProbability = crossoverProbability ;
 	    this.distributionIndex = distributionIndex ;
 	    this.solutionRepair = solutionRepair ;
-
 	    this.randomGenerator = randomGenerator ;
+	    this.problem = problem;
 	  }
 
 	  /* Getters */
@@ -142,26 +145,26 @@ public class SMOCrossover implements CrossoverOperator<DoubleSolution>{
 	        boolean[] status = new boolean[parent1.getNumberOfVariables()];
 	        List<Integer> recordTrue = new ArrayList<Integer>();
 	        List<Integer> recordFalse = new ArrayList<Integer>();
+	        Map<Integer,Integer> map = new HashMap<Integer,Integer>();
 	        
 	        for(int i=0;i<parent1.getNumberOfVariables();i++){
 	        	if(Math.abs(up[i]-low[i])> Orthogonal.getThreshold()){
 	        		count++;
 	        		status[i] = true;
 	        		recordTrue.add(i);
+	        		map.put(i,count-1);
 	        	}else{
 	        		status[i] = false;
 	        		recordFalse.add(i);
 	        	}
 	        }
 	        
-	        
-	        
+	        if(count>0){
 	        //离散化矩阵和正交表映射
 	        Orthogonal.setF(count);
-	        int [][] orthogonaltable = Orthogonal.getOrthogoanlTable();
-	        	        
+	        int [][] orthogonaltable = Orthogonal.getOrthogoanlTable();	        
 	        double[][] maptable = new double[Orthogonal.getRows()][parent1.getNumberOfVariables()];
-	       
+	        
 	        //大于阈值的列进行填充
 	        for(int j=0;j<count;j++){
 	        	int col = recordTrue.get(j);
@@ -171,108 +174,54 @@ public class SMOCrossover implements CrossoverOperator<DoubleSolution>{
 	        }
 	        
 	        //小于阈值的列进行填充
-	        
-	        
-	        
-	        
-	        
-	    	for (int i = 1; i <= my_pow(q, Selec_j(q, count)); i++)//映射正交没有选中的几列
-	    	{
-	    		for (int j = 1; j <= f; j++)//count是根据阈值新生成的数组的大小
-	    		{
-	    			if (status[j] == false)
-	    			{
-	    				int t1 = j - 1;
-	    				while (t1 >= 1 && status[t1] != true)
-	    				{
-	    					t1--;
-	    				}
-	    				if (t1 < 1)//左边找不到往右找
-	    				{
-	    					int t2 = j + 1;
-	    					while (status[t2] != true)
+	       if(count>0 && count<parent1.getNumberOfVariables()){
+	        for(int i=0;i<Orthogonal.getRows();i++){
+	        	for(int j = 0;j<parent1.getNumberOfVariables();j++){
+	        		if(status[j]==false){
+	        			int t1 = j;
+	        			while(t1>=0 && status[t1]!=true){
+	        				t1--;
+	        			}
+	        			if(t1<0 &&(j+1<parent1.getNumberOfVariables())){
+	        				int t2 = j + 1;
+	    					while (t2<parent1.getNumberOfVariables() && status[t2] != true)
 	    					{
 	    						t2++;
 	    					}
-	    					if (status[t2] == true)
+	    					if (t2<parent1.getNumberOfVariables()&&status[t2] == true)
 	    					{
-	    						int temp21 = record_statue[t2];//取出status列 对应的正交表的列
-	    						int temp22 = pop[temp21].col_length[i];//取出正交表中对应的离散化矩阵的位置
-	    						out_array[j].col_length[i] = value_arry[j].col_length[temp22];
+	    						int temp21 = map.get(t2);//record_statue[t2];//取出status列 对应的正交表的列
+	    						int temp22 = orthogonaltable[i][temp21];//pop[temp21].col_length[i];//取出正交表中对应的离散化矩阵的位置
+	    						maptable[i][j] = disArray[temp22-1][j];//out_array[j].col_length[i] = value_arry[j].col_length[temp22];
 	    					}
 	    				}
 	    				else//左边找到
 	    				{
-	    					int temp31 = record_statue[t1];
-	    					int temp32 = pop[temp31].col_length[i];//取出正交表中对应的离散化矩阵的位置
-	    					out_array[j].col_length[i] = value_arry[j].col_length[temp32];
+	    					int temp31 = map.get(t1);//record_statue[t1];
+	    					int temp32 = orthogonaltable[i][temp31];//pop[temp31].col_length[i];//取出正交表中对应的离散化矩阵的位置
+	    					maptable[i][j] = disArray[temp32-1][j];// out_array[j].col_length[i] = value_arry[j].col_length[temp32];
 	    				}
-	    			}//
-	    		}
-	    	}
-	        
-	        
-	        
-	        
-	        
-	        
-	         
-//	        
-//	        if (randomGenerator.getRandomValue() <= 0.5) {
-//	          if (Math.abs(valueX1 - valueX2) > EPS) {
-//
-//	            if (valueX1 < valueX2) {
-//	              y1 = valueX1;
-//	              y2 = valueX2;
-//	            } else {
-//	              y1 = valueX2;
-//	              y2 = valueX1;
-//	            }
-//
-//	            lowerBound = parent1.getLowerBound(i);
-//	            upperBound = parent1.getUpperBound(i);
-//
-//	            rand = randomGenerator.getRandomValue();
-//	            beta = 1.0 + (2.0 * (y1 - lowerBound) / (y2 - y1));
-//	            alpha = 2.0 - Math.pow(beta, -(distributionIndex + 1.0));
-//
-//	            if (rand <= (1.0 / alpha)) {
-//	              betaq = Math.pow(rand * alpha, (1.0 / (distributionIndex + 1.0)));
-//	            } else {
-//	              betaq = Math
-//	                  .pow(1.0 / (2.0 - rand * alpha), 1.0 / (distributionIndex + 1.0));
-//	            }
-//	            c1 = 0.5 * (y1 + y2 - betaq * (y2 - y1));
-//
-//	            beta = 1.0 + (2.0 * (upperBound - y2) / (y2 - y1));
-//	            alpha = 2.0 - Math.pow(beta, -(distributionIndex + 1.0));
-//
-//	            if (rand <= (1.0 / alpha)) {
-//	              betaq = Math.pow((rand * alpha), (1.0 / (distributionIndex + 1.0)));
-//	            } else {
-//	              betaq = Math
-//	                  .pow(1.0 / (2.0 - rand * alpha), 1.0 / (distributionIndex + 1.0));
-//	            }
-//	            c2 = 0.5 * (y1 + y2 + betaq * (y2 - y1));
-//
-//	            c1 = solutionRepair.repairSolutionVariableValue(c1, lowerBound, upperBound) ;
-//	            c2 = solutionRepair.repairSolutionVariableValue(c2, lowerBound, upperBound) ;
-//
-//	            if (randomGenerator.getRandomValue() <= 0.5) {
-//	              offspring.get(0).setVariableValue(i, c2);
-//	              offspring.get(1).setVariableValue(i, c1);
-//	            } else {
-//	              offspring.get(0).setVariableValue(i, c1);
-//	              offspring.get(1).setVariableValue(i, c2);
-//	            }
-//	          } else {
-//	            offspring.get(0).setVariableValue(i, valueX1);
-//	            offspring.get(1).setVariableValue(i, valueX2);
-//	          }
-//	        } else {
-//	          offspring.get(0).setVariableValue(i, valueX1);
-//	          offspring.get(1).setVariableValue(i, valueX2);
-//	        }	  
+	        		}
+	        	}
+	        }
+	        }
+	       
+	       
+	       
+	  System.out.println("Q:"+Orthogonal.getQ()+"  "+"F:"+Orthogonal.getF()+" "+"count:"+count);  
+	  System.out.println("row:"+maptable.length+"  "+"col:"+maptable[0].length);
+	        for(int i = 0;i<maptable.length;i++){
+	        	for(int j = 0;j<maptable[0].length;j++){
+	        		System.out.print(maptable[i][j]+", ");
+	        	}
+	        	System.out.println();
+	        }
+	   }else{
+		   //走原来的交叉
+	   }
+//	    while(true){
+//	    }
+	    		       
 	    }
 
 	    return offspring;
@@ -287,4 +236,12 @@ public class SMOCrossover implements CrossoverOperator<DoubleSolution>{
 	  public int getNumberOfGeneratedChildren() {
 	    return 2;
 	  }
+
+	public Problem<DoubleSolution> getProblem() {
+		return problem;
+	}
+
+	public void setProblem(Problem<DoubleSolution> problem) {
+		this.problem = problem;
+	}
 	}

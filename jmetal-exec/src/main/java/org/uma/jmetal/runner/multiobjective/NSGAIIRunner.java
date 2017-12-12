@@ -67,12 +67,10 @@ public class NSGAIIRunner extends AbstractAlgorithmRunner {
     double crossoverProbability = 0.9 ;
     double crossoverDistributionIndex = 20.0 ;
     //crossover = new SBXCrossover(crossoverProbability, crossoverDistributionIndex) ;
-    Orthogonal.setQ(3);
-    Orthogonal.setThreshold(0.7);
-    crossover = new SMOCrossover(crossoverProbability, crossoverDistributionIndex) ;
-
-    
-    double mutationProbability = 1.0 / problem.getNumberOfVariables() ;
+    Orthogonal.setQ(3); //水平数
+    Orthogonal.setThreshold(0.7); //初始阈值
+    crossover = new SMOCrossover(crossoverProbability, crossoverDistributionIndex,problem);
+    double mutationProbability = 1.0 / problem.getNumberOfVariables();
     double mutationDistributionIndex = 20.0 ;
     mutation = new PolynomialMutation(mutationProbability, mutationDistributionIndex) ;
 
