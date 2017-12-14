@@ -55,7 +55,7 @@ public class My_DE_Runner extends AbstractAlgorithmRunner{/**
 
 	    double crossoverProbability = 0.9 ;
 	    double crossoverDistributionIndex = 20.0 ;
-	    OrthogonalTable.setQ(2); //水平数
+	    OrthogonalTable.setQ(3); //水平数
 	    OrthogonalTable.setThreshold(0.2); //初始阈值
 	    crossover = new SMOCrossover(crossoverProbability, crossoverDistributionIndex,problem);
 	    double mutationProbability = 1.0 / problem.getNumberOfVariables();
@@ -67,7 +67,7 @@ public class My_DE_Runner extends AbstractAlgorithmRunner{/**
 
 	      algorithm = new NSGAIIBuilder<DoubleSolution>(problem, crossover, mutation)
 	        .setSelectionOperator(selection)
-	        .setMaxEvaluations(25000) //最大评估代数
+	        .setMaxEvaluations(300) //最大评估代数
 	        .setPopulationSize(300) //种群个体数量
 	        .build() ;
 
