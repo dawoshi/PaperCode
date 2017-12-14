@@ -44,7 +44,9 @@ public class NSGAIIBuilder<S extends Solution<?>> implements AlgorithmBuilder<NS
     this.crossoverOperator = crossoverOperator ;
     this.mutationOperator = mutationOperator ;
     selectionOperator = new BinaryTournamentSelection<S>(new RankingAndCrowdingDistanceComparator<S>()) ;
-    evaluator = new SequentialSolutionListEvaluator<S>();
+    
+    
+    evaluator = new SequentialSolutionListEvaluator<S>(); //评估函数
 
     this.variant = NSGAIIVariant.NSGAII ;
   }

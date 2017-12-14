@@ -3,26 +3,33 @@ package org.uma.jmetal.operator.impl.crossover;
 import org.uma.jmetal.operator.CrossoverOperator;
 import org.uma.jmetal.problem.Problem;
 import org.uma.jmetal.solution.DoubleSolution;
+import org.uma.jmetal.solution.Solution;
 import org.uma.jmetal.solution.util.RepairDoubleSolution;
 import org.uma.jmetal.solution.util.RepairDoubleSolutionAtBounds;
 import org.uma.jmetal.util.JMetalException;
 import org.uma.jmetal.util.pseudorandom.JMetalRandom;
 import org.uma.jmetal.util.pseudorandom.RandomGenerator;
-import org.uma.jmetal.util.Orthogonal;
+import org.uma.jmetal.util.solutionattribute.impl.OverallConstraintViolation;
+import org.uma.jmetal.util.OrthogonalTable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 
  * @author William.guo <guoxinian@aliyun.com>
+ * @param <S>
  *
  */
 
 @SuppressWarnings("serial")
-public class SMOCrossover implements CrossoverOperator<DoubleSolution>{
+public class SMOCrossover<S extends Solution<?>> implements CrossoverOperator<DoubleSolution>{
 	 private static final double EPS = 1.0e-14;
 
 	  private double distributionIndex ;
@@ -30,6 +37,7 @@ public class SMOCrossover implements CrossoverOperator<DoubleSolution>{
 	  private RepairDoubleSolution solutionRepair ;
 	  private Problem<DoubleSolution> problem;
 	  private RandomGenerator<Double> randomGenerator ;
+	  OverallConstraintViolation<DoubleSolution> overallConstraintViolation;
 
 	  /** Constructor */
 	  public SMOCrossover(double crossoverProbability, double distributionIndex,Problem<DoubleSolution> problem) {
@@ -99,7 +107,6 @@ public class SMOCrossover implements CrossoverOperator<DoubleSolution>{
 	    offspring.add((DoubleSolution) parent1.copy()) ;
 	    offspring.add((DoubleSolution) parent2.copy()) ;
 
-	    //int i;
 	    double rand;
 	    double y1, y2, lowerBound, upperBound;
 	    double c1, c2;
@@ -126,14 +133,14 @@ public class SMOCrossover implements CrossoverOperator<DoubleSolution>{
 	      }
 	        
 	        //up-low数组离散化
-	        double[][] disArray = new double[Orthogonal.getQ()][parent1.getNumberOfVariables()];
+	        double[][] disArray = new double[OrthogonalTable.getQ()][parent1.getNumberOfVariables()];
 	       
 	        for (int i = 0; i < parent1.getNumberOfVariables(); i++) {
-	        	for(int j = 0;j<Orthogonal.getQ();j++){
+	        	for(int j = 0;j<OrthogonalTable.getQ();j++){
 	        		if(j ==0){
 	        			disArray[j][i] = low[i]; 
-	        		}else if(j>0&&j<(Orthogonal.getQ()-1)){
-	        			disArray[j][i] = low[i]+j*((up[i]-low[i])/(Orthogonal.getQ()-1));
+	        		}else if(j>0&&j<(OrthogonalTable.getQ()-1)){
+	        			disArray[j][i] = low[i]+j*((up[i]-low[i])/(OrthogonalTable.getQ()-1));
 	        		}else{
 	        			disArray[j][i] = up[i];
 	        		}
@@ -148,7 +155,7 @@ public class SMOCrossover implements CrossoverOperator<DoubleSolution>{
 	        Map<Integer,Integer> map = new HashMap<Integer,Integer>();
 	        
 	        for(int i=0;i<parent1.getNumberOfVariables();i++){
-	        	if(Math.abs(up[i]-low[i])> Orthogonal.getThreshold()){
+	        	if(Math.abs(up[i]-low[i])> OrthogonalTable.getThreshold()){
 	        		count++;
 	        		status[i] = true;
 	        		recordTrue.add(i);
@@ -161,21 +168,23 @@ public class SMOCrossover implements CrossoverOperator<DoubleSolution>{
 	        
 	        if(count>0){
 	        //离散化矩阵和正交表映射
-	        Orthogonal.setF(count);
-	        int [][] orthogonaltable = Orthogonal.getOrthogoanlTable();	        
-	        double[][] maptable = new double[Orthogonal.getRows()][parent1.getNumberOfVariables()];
+	        	
+	        	OrthogonalTable.setF(count); // 自适应F
+	        	
+	        int [][] orthogonaltable = OrthogonalTable.getOrthogoanlTable();	        
+	        double[][] maptable = new double[OrthogonalTable.getRows()][parent1.getNumberOfVariables()];
 	        
 	        //大于阈值的列进行填充
 	        for(int j=0;j<count;j++){
 	        	int col = recordTrue.get(j);
-	        	for(int i = 0;i<Orthogonal.getRows();i++){
+	        	for(int i = 0;i<OrthogonalTable.getRows();i++){
 	        		maptable[i][col] = disArray[orthogonaltable[i][j]-1][col];
 	        	}
 	        }
 	        
 	        //小于阈值的列进行填充
 	       if(count>0 && count<parent1.getNumberOfVariables()){
-	        for(int i=0;i<Orthogonal.getRows();i++){
+	        for(int i=0;i<OrthogonalTable.getRows();i++){
 	        	for(int j = 0;j<parent1.getNumberOfVariables();j++){
 	        		if(status[j]==false){
 	        			int t1 = j;
@@ -206,23 +215,114 @@ public class SMOCrossover implements CrossoverOperator<DoubleSolution>{
 	        }
 	        }
 	       
+	       //计算目标函数值
+	       List<DoubleSolution> population = new ArrayList<>(maptable.length);
+	       for(int i = 0;i<maptable.length;i++){
+	    	   DoubleSolution newIndividual = getProblem().createSolution();
+	    	   for(int j = 0;j<maptable[0].length;j++){
+	    		   newIndividual.setVariableValue(j, maptable[i][j]);
+	    	   }
+	    	   getProblem().evaluate(newIndividual); //计算目标函数值赋值给solution.obj[]
+	    	   population.add(newIndividual);
+	       }
+	       
+	       System.out.println("Q:"+OrthogonalTable.getQ());
+	       
+	       List<List<Double>> ress = new ArrayList<List<Double>>();
+	       //获取目标函数值
+	       for(int j =0;j<maptable[0].length;j++){  //列数
+	    	   double[][] avgmap = new double[OrthogonalTable.getQ()][problem.getNumberOfObjectives()];
+	    	   double[] valmap = new double[OrthogonalTable.getQ()];
+	    	   int rowindex = -1;
+	    	   Set<Double> set = new HashSet<Double>();
+	    	   for(int i =0;i<maptable.length;i++){
+	    		   set.add(population.get(i).getVariableValue(j));
+	    	   }
+	    	   Iterator<Double> it = set.iterator();
+	    	   while(it.hasNext()){
+	    		   double value = it.next();
+	    		   double[] sum = new double[parent1.getNumberOfObjectives()];
+	    		   for(int row = 0;row<maptable.length;row++){
+	    			   int indexcount = -1;
+	    			   if(population.get(row).getVariableValue(j) == value){
+	    				   for(int obv = 0;obv<population.get(row).getNumberOfObjectives();obv++){
+	    				         sum[++indexcount]+=population.get(row).getObjective(obv);
+	    				   }
+	    			   }
+	    		   }
+	    		   valmap[++rowindex] = value;
+	    		   for(int sumindex = 0;sumindex<sum.length;sumindex++){
+	    			   avgmap[rowindex][sumindex] = sum[sumindex]/OrthogonalTable.getQ(); 
+	    		   }
+	    	   }
+	    	   
+	    	   for(int i=0;i<avgmap.length;i++){
+	    		   System.out.print(valmap[i]+", ");
+	    		   for(int s = 0;s<avgmap[i].length;s++){
+	    			  
+	    			   System.out.print(avgmap[i][s]+", ");
+	    			   
+	    		   }
+	    		   System.out.println();
+	    	   }
+	    	   System.out.println("j:"+j+"-------------------------------------");
+	    	   ArrayList<Double> res = new ArrayList<Double>();
+	    	   for(int avgrow =0;avgrow<avgmap.length;avgrow++){
+	    		   boolean flag = false;
+	    		   for(int avgrow2 = 0;avgrow2<avgmap.length;avgrow2++){
+	    			   if(avgrow != avgrow2){
+	    				   int dominacecount = 0;
+	    				   for(int avgcol = 0;avgcol<avgmap[0].length;avgcol++){
+	    					   if(avgmap[avgrow][avgcol]>avgmap[avgrow2][avgcol]){
+	    						   dominacecount++;
+	    					   }
+	    				   }
+	    				   if(dominacecount == parent1.getNumberOfObjectives()){
+	    					   flag = true;
+	    				   } 
+	    			   }
+	    		   }
+	    		   if(flag == false){
+	    			   res.add(valmap[avgrow]); 
+	    		   }
+	    	   }
+	    	   ress.add(res);
+	       }
 	       
 	       
-	  System.out.println("Q:"+Orthogonal.getQ()+"  "+"F:"+Orthogonal.getF()+" "+"count:"+count);  
-	  System.out.println("row:"+maptable.length+"  "+"col:"+maptable[0].length);
-	        for(int i = 0;i<maptable.length;i++){
-	        	for(int j = 0;j<maptable[0].length;j++){
-	        		System.out.print(maptable[i][j]+", ");
-	        	}
-	        	System.out.println();
-	        }
+	       
+	       for(int i=0;i<ress.size();i++){
+	    	   System.out.println("i:"+i);
+	    	   for(int j = 0;j<ress.get(i).size();j++){
+	    		   System.out.print(ress.get(i).get(j)+", ");
+	    	   }
+	    	   System.out.println();
+	       }
+	       
+	       List<List<Double>> ant = new ArrayList<List<Double>>();
+	       recursive (ress,ant, 0, new ArrayList<Double>());
+	       if(ant.size()>0){
+	    	   System.out.println("row:"+ant.size()+","+"col:"+ant.get(0).size());
+	       }
+	       System.out.println("---------------------------");
+	       for(int i=0;i<ant.size();i++){
+	    	   for(int s=0; s<ant.get(i).size(); s++){
+	    		   System.out.print(ant.get(i).get(s)+", ");
+	    	   }
+	    	   System.out.println();
+	       }
+	       
+
+	       
+	       while(true){
+    		   
+    	   }  
+	       }
+	       
 	   }else{
 		   //走原来的交叉
 	   }
-//	    while(true){
-//	    }
-	    		       
-	    }
+	  
 
 	    return offspring;
 	  }
@@ -244,4 +344,28 @@ public class SMOCrossover implements CrossoverOperator<DoubleSolution>{
 	public void setProblem(Problem<DoubleSolution> problem) {
 		this.problem = problem;
 	}
+     
+	private static void recursive (List<List<Double>> dimValue, List<List<Double>> result, int layer, List<Double> curList) {  
+        if (layer < dimValue.size() - 1) {  
+            if (dimValue.get(layer).size() == 0) {  
+                recursive(dimValue, result, layer + 1, curList);  
+            } else {  
+                for (int i = 0; i < dimValue.get(layer).size(); i++) {  
+                    List<Double> list = new ArrayList<Double>(curList);  
+                    list.add(dimValue.get(layer).get(i));  
+                    recursive(dimValue, result, layer + 1, list);  
+                }  
+            }  
+        } else if (layer == dimValue.size() - 1) {  
+            if (dimValue.get(layer).size() == 0) {  
+                result.add(curList);  
+            } else {  
+                for (int i = 0; i < dimValue.get(layer).size(); i++) {  
+                    List<Double> list = new ArrayList<Double>(curList);  
+                    list.add(dimValue.get(layer).get(i));  
+                    result.add(list);  
+                }  
+            }  
+        }  
+    }  
 	}

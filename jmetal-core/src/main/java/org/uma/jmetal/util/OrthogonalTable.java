@@ -2,7 +2,7 @@ package org.uma.jmetal.util;
 
 import java.util.ArrayList;
 
-public class Orthogonal{
+public class OrthogonalTable{
 	private static int Q; //水平数
 	private static int F; //维度数
 	private static int basecolumns; //基本列
@@ -52,10 +52,10 @@ public class Orthogonal{
 	}
 	public static void main(String args[]){
 		
-		Orthogonal.setF(1);
-		Orthogonal.setQ(3);
-		System.out.println("rows"+Orthogonal.getRows());
-		int [][] a= Orthogonal.getOrthogoanlTable();
+		OrthogonalTable.setF(2);
+		OrthogonalTable.setQ(3);
+		System.out.println("rows"+OrthogonalTable.getRows());
+		int [][] a= OrthogonalTable.getOrthogoanlTable();
 		for(int i =0;i<a.length;i++){
 			for(int j = 0;j<a[0].length;j++){
 				System.out.print(a[i][j]+",");
@@ -89,7 +89,7 @@ public class Orthogonal{
 	}
 
 	public static void setColumns(int columns) {
-		Orthogonal.columns = columns;
+		OrthogonalTable.columns = columns;
 	}
 
 	public static int getBasecolumns() {
@@ -97,7 +97,7 @@ public class Orthogonal{
 	}
 
 	public static void setBasecolumns(int basecolumns) {
-		Orthogonal.basecolumns = basecolumns;
+		OrthogonalTable.basecolumns = basecolumns;
 	}
 	public static int getRows() {
 		for(int J = 0;;J++){
@@ -112,7 +112,7 @@ public class Orthogonal{
 		return threshold;
 	}
 	public static void setThreshold(double threshold) {
-		Orthogonal.threshold = threshold;
+		OrthogonalTable.threshold = threshold;
 	}
 
 }

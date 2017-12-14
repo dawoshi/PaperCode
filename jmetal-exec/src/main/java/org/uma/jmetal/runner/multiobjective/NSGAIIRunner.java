@@ -17,7 +17,7 @@ import org.uma.jmetal.solution.DoubleSolution;
 import org.uma.jmetal.util.AlgorithmRunner;
 import org.uma.jmetal.util.JMetalException;
 import org.uma.jmetal.util.JMetalLogger;
-import org.uma.jmetal.util.Orthogonal;
+import org.uma.jmetal.util.OrthogonalTable;
 import org.uma.jmetal.util.ProblemUtils;
 import org.uma.jmetal.util.comparator.RankingAndCrowdingDistanceComparator;
 
@@ -67,9 +67,11 @@ public class NSGAIIRunner extends AbstractAlgorithmRunner {
     double crossoverProbability = 0.9 ;
     double crossoverDistributionIndex = 20.0 ;
     //crossover = new SBXCrossover(crossoverProbability, crossoverDistributionIndex) ;
-    Orthogonal.setQ(3); //水平数
-    Orthogonal.setThreshold(0.7); //初始阈值
+    OrthogonalTable.setQ(3); //水平数
+    OrthogonalTable.setThreshold(0.7); //初始阈值
     crossover = new SMOCrossover(crossoverProbability, crossoverDistributionIndex,problem);
+    
+    
     double mutationProbability = 1.0 / problem.getNumberOfVariables();
     double mutationDistributionIndex = 20.0 ;
     mutation = new PolynomialMutation(mutationProbability, mutationDistributionIndex) ;
@@ -77,7 +79,7 @@ public class NSGAIIRunner extends AbstractAlgorithmRunner {
     selection = new BinaryTournamentSelection<DoubleSolution>(
         new RankingAndCrowdingDistanceComparator<DoubleSolution>());
 
-    algorithm = new NSGAIIBuilder<DoubleSolution>(problem, crossover, mutation)
+      algorithm = new NSGAIIBuilder<DoubleSolution>(problem, crossover, mutation)
         .setSelectionOperator(selection)
         .setMaxEvaluations(25000) //最大评估代数
         .setPopulationSize(300) //种群个体数量

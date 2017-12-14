@@ -42,6 +42,9 @@ public class DominanceRanking <S extends Solution<?>>
     rankedSubPopulations = new ArrayList<>();
   }
 
+  
+  //非支配排序计算
+  
   @Override
   public Ranking<S> computeRanking(List<S> solutionSet) {
     List<S> population = solutionSet;
