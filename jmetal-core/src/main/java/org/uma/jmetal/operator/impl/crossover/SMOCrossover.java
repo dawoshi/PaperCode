@@ -1,6 +1,7 @@
 package org.uma.jmetal.operator.impl.crossover;
 
 import org.uma.jmetal.operator.CrossoverOperator;
+import org.uma.jmetal.operator.impl.selection.RankingAndCrowdingSelection;
 import org.uma.jmetal.problem.Problem;
 import org.uma.jmetal.solution.DoubleSolution;
 import org.uma.jmetal.solution.Solution;
@@ -99,20 +100,16 @@ public class SMOCrossover<S extends Solution<?>> implements CrossoverOperator<Do
 	    return doCrossover(crossoverProbability, solutions.get(0), solutions.get(1)) ;
 	  }
 
-	  /** doCrossover method */
-	  public List<DoubleSolution> doCrossover(
-	      double probability, DoubleSolution parent1, DoubleSolution parent2) {
-	    List<DoubleSolution> offspring = new ArrayList<DoubleSolution>(2);
-
+	  /** do-selfadjust-Crossover method */
+	  public List<DoubleSolution> doCrossover(double probability, DoubleSolution parent1, DoubleSolution parent2) {
+	    List<DoubleSolution> offspring = new ArrayList<DoubleSolution>();
 	    offspring.add((DoubleSolution) parent1.copy()) ;
 	    offspring.add((DoubleSolution) parent2.copy()) ;
-
 	    double rand;
 	    double y1, y2, lowerBound, upperBound;
 	    double c1, c2;
 	    double alpha, beta, betaq;
 	    double valueX1, valueX2;
-
 	    if (randomGenerator.getRandomValue() <= probability) {
 	    	double[] low = new double[parent1.getNumberOfVariables()];
 	    	double[] up = new double[parent1.getNumberOfVariables()];
@@ -166,7 +163,7 @@ public class SMOCrossover<S extends Solution<?>> implements CrossoverOperator<Do
 	        	}
 	        }
 	        
-	        if(count>0){
+	        if(count>1){
 	        //离散化矩阵和正交表映射
 	        	
 	        	OrthogonalTable.setF(count); // 自适应F
@@ -256,16 +253,21 @@ public class SMOCrossover<S extends Solution<?>> implements CrossoverOperator<Do
 	    		   }
 	    	   }
 	    	   
-	    	   for(int i=0;i<avgmap.length;i++){
-	    		   System.out.print(valmap[i]+", ");
-	    		   for(int s = 0;s<avgmap[i].length;s++){
-	    			  
-	    			   System.out.print(avgmap[i][s]+", ");
-	    			   
-	    		   }
-	    		   System.out.println();
-	    	   }
-	    	   System.out.println("j:"+j+"-------------------------------------");
+	    	   //----------------测试输出----------------------------------------------
+//	    	   for(int i=0;i<avgmap.length;i++){
+//	    		   System.out.print(valmap[i]+", ");
+//	    		   for(int s = 0;s<avgmap[i].length;s++){
+//	    			  
+//	    			   System.out.print(avgmap[i][s]+", ");
+//	    			   
+//	    		   }
+//	    		   System.out.println();
+//	    	   }
+//	    	   System.out.println("j:"+j+"-------------------------------------");
+	    	   //------------------------------------------------------------------------
+	    	   
+	    	   
+	    	   
 	    	   ArrayList<Double> res = new ArrayList<Double>();
 	    	   for(int avgrow =0;avgrow<avgmap.length;avgrow++){
 	    		   boolean flag = false;
@@ -273,7 +275,8 @@ public class SMOCrossover<S extends Solution<?>> implements CrossoverOperator<Do
 	    			   if(avgrow != avgrow2){
 	    				   int dominacecount = 0;
 	    				   for(int avgcol = 0;avgcol<avgmap[0].length;avgcol++){
-	    					   if(avgmap[avgrow][avgcol]>avgmap[avgrow2][avgcol]){
+	    					   //大于等于
+	    					   if(avgmap[avgrow][avgcol]>=avgmap[avgrow2][avgcol]){
 	    						   dominacecount++;
 	    					   }
 	    				   }
@@ -291,39 +294,109 @@ public class SMOCrossover<S extends Solution<?>> implements CrossoverOperator<Do
 	       
 	       
 	       
-	       for(int i=0;i<ress.size();i++){
-	    	   System.out.println("i:"+i);
-	    	   for(int j = 0;j<ress.get(i).size();j++){
-	    		   System.out.print(ress.get(i).get(j)+", ");
-	    	   }
-	    	   System.out.println();
-	       }
+	       //------------------测试输出------------------------------
+//	       for(int i=0;i<ress.size();i++){
+//	    	   System.out.println("i:"+i);
+//	    	   for(int j = 0;j<ress.get(i).size();j++){
+//	    		   System.out.print(ress.get(i).get(j)+", ");
+//	    	   }
+//	    	   System.out.println();
+//	       }
+	       //----------------------------------------------------------
+	       
+	       
 	       
 	       List<List<Double>> ant = new ArrayList<List<Double>>();
 	       recursive (ress,ant, 0, new ArrayList<Double>());
+	       List<DoubleSolution> pop = new ArrayList<>(ant.size());
 	       if(ant.size()>0){
-	    	   System.out.println("row:"+ant.size()+","+"col:"+ant.get(0).size());
-	       }
-	       System.out.println("---------------------------");
-	       for(int i=0;i<ant.size();i++){
-	    	   for(int s=0; s<ant.get(i).size(); s++){
-	    		   System.out.print(ant.get(i).get(s)+", ");
+	       for(int i = 0;i<ant.size();i++){
+	    	   DoubleSolution newIndividual = getProblem().createSolution();
+	    	   for(int j = 0;j<ant.get(i).size();j++){
+	    		   newIndividual.setVariableValue(j, ant.get(i).get(j));
 	    	   }
-	    	   System.out.println();
+	    	   getProblem().evaluate(newIndividual); //计算目标函数值赋值给solution.obj[]
+	    	   pop.add(newIndividual);
 	       }
-	       
-
-	       
-	       while(true){
-    		   
-    	   }  
 	       }
-	       
-	   }else{
-		   //走原来的交叉
-	   }
-	  
+	      if(pop.size()>10){
+	    	    RankingAndCrowdingSelection<DoubleSolution> rankingAndCrowdingSelection ;
+	    	    rankingAndCrowdingSelection = new RankingAndCrowdingSelection<DoubleSolution>(10) ;
+	    	    offspring= rankingAndCrowdingSelection.execute(pop) ;
+	      }else{
+	    	  offspring = pop;
+	      }
+	    }else{  //count<0  进行传统交叉操作
+	    	
+	    	  for (int i = 0; i < parent1.getNumberOfVariables(); i++) {
+	    	        valueX1 = parent1.getVariableValue(i);
+	    	        valueX2 = parent2.getVariableValue(i);
+	    	        if (randomGenerator.getRandomValue() <= 0.5) {
+	    	          if (Math.abs(valueX1 - valueX2) > EPS) {
 
+	    	            if (valueX1 < valueX2) {
+	    	              y1 = valueX1;
+	    	              y2 = valueX2;
+	    	            } else {
+	    	              y1 = valueX2;
+	    	              y2 = valueX1;
+	    	            }
+
+	    	            lowerBound = parent1.getLowerBound(i);
+	    	            upperBound = parent1.getUpperBound(i);
+
+	    	            rand = randomGenerator.getRandomValue();
+	    	            beta = 1.0 + (2.0 * (y1 - lowerBound) / (y2 - y1));
+	    	            alpha = 2.0 - Math.pow(beta, -(distributionIndex + 1.0));
+
+	    	            if (rand <= (1.0 / alpha)) {
+	    	              betaq = Math.pow(rand * alpha, (1.0 / (distributionIndex + 1.0)));
+	    	            } else {
+	    	              betaq = Math
+	    	                  .pow(1.0 / (2.0 - rand * alpha), 1.0 / (distributionIndex + 1.0));
+	    	            }
+	    	            c1 = 0.5 * (y1 + y2 - betaq * (y2 - y1));
+
+	    	            beta = 1.0 + (2.0 * (upperBound - y2) / (y2 - y1));
+	    	            alpha = 2.0 - Math.pow(beta, -(distributionIndex + 1.0));
+
+	    	            if (rand <= (1.0 / alpha)) {
+	    	              betaq = Math.pow((rand * alpha), (1.0 / (distributionIndex + 1.0)));
+	    	            } else {
+	    	              betaq = Math
+	    	                  .pow(1.0 / (2.0 - rand * alpha), 1.0 / (distributionIndex + 1.0));
+	    	            }
+	    	            c2 = 0.5 * (y1 + y2 + betaq * (y2 - y1));
+
+	    	            c1 = solutionRepair.repairSolutionVariableValue(c1, lowerBound, upperBound) ;
+	    	            c2 = solutionRepair.repairSolutionVariableValue(c2, lowerBound, upperBound) ;
+
+	    	            if (randomGenerator.getRandomValue() <= 0.5) {
+	    	              offspring.get(0).setVariableValue(i, c2);
+	    	              offspring.get(1).setVariableValue(i, c1);
+	    	            } else {
+	    	              offspring.get(0).setVariableValue(i, c1);
+	    	              offspring.get(1).setVariableValue(i, c2);
+	    	            }
+	    	          } else {
+	    	            offspring.get(0).setVariableValue(i, valueX1);
+	    	            offspring.get(1).setVariableValue(i, valueX2);
+	    	          }
+	    	        } else {
+	    	          offspring.get(0).setVariableValue(i, valueX1);
+	    	          offspring.get(1).setVariableValue(i, valueX2);
+	    	        }
+	    	      }
+	    	
+	    }
+	  }	 
+	      System.out.println("---------------------------");
+	      for(int i = 0;i<offspring.size();i++){
+	    	  for(int j = 0;j<offspring.get(i).getNumberOfVariables();j++){
+	    		  System.out.print(offspring.get(i).getVariableValue(j)+", ");
+	    	  }
+	    	  System.out.println();
+	      }
 	    return offspring;
 	  }
 
@@ -345,6 +418,8 @@ public class SMOCrossover<S extends Solution<?>> implements CrossoverOperator<Do
 		this.problem = problem;
 	}
      
+	
+	//笛卡尔积
 	private static void recursive (List<List<Double>> dimValue, List<List<Double>> result, int layer, List<Double> curList) {  
         if (layer < dimValue.size() - 1) {  
             if (dimValue.get(layer).size() == 0) {  
