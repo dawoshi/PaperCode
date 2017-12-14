@@ -89,7 +89,7 @@ public class ArrayFront implements Front {
   public ArrayFront(String fileName) throws FileNotFoundException {
     this() ;
     // TODO: investigate why no exception is raised if fileName == ""
-    System.out.println("arrayfront:"+fileName);
+    System.out.println("arrayfront--:"+fileName);
     InputStream inputStream = createInputStream(fileName) ;
 
     InputStreamReader isr = new InputStreamReader(inputStream);
@@ -144,7 +144,7 @@ public class ArrayFront implements Front {
     InputStream inputStream = getClass().getResourceAsStream(fileName);
     System.out.println("arrayfront:"+fileName);
     if (inputStream == null) {
-        System.out.println("inputstram == null");
+        //System.out.println("inputstram == null");
       inputStream = new FileInputStream(fileName) ;
       if(inputStream == null){
     	  System.out.println("inputstream null 2");

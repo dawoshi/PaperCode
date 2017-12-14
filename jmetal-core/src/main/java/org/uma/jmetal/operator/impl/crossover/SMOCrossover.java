@@ -30,7 +30,7 @@ import java.util.Set;
  */
 
 @SuppressWarnings("serial")
-public class SMOCrossover<S extends Solution<?>> implements CrossoverOperator<DoubleSolution>{
+public class SMOCrossover implements CrossoverOperator<DoubleSolution>{
 	 private static final double EPS = 1.0e-14;
 
 	  private double distributionIndex ;
@@ -120,7 +120,7 @@ public class SMOCrossover<S extends Solution<?>> implements CrossoverOperator<Do
 	        
 	        //生成【parent1，paarent2】之间的 up-low数组
 	        
-	        if(valueX1>valueX2){
+	        if(valueX1>=valueX2){
 	        	up[i] = valueX1;
 	        	low[i] = valueX2;
 	        }else{
@@ -165,12 +165,9 @@ public class SMOCrossover<S extends Solution<?>> implements CrossoverOperator<Do
 	        
 	        if(count>1){
 	        //离散化矩阵和正交表映射
-	        	
 	        	OrthogonalTable.setF(count); // 自适应F
-	        	
 	        int [][] orthogonaltable = OrthogonalTable.getOrthogoanlTable();	        
 	        double[][] maptable = new double[OrthogonalTable.getRows()][parent1.getNumberOfVariables()];
-	        
 	        //大于阈值的列进行填充
 	        for(int j=0;j<count;j++){
 	        	int col = recordTrue.get(j);
@@ -211,7 +208,6 @@ public class SMOCrossover<S extends Solution<?>> implements CrossoverOperator<Do
 	        	}
 	        }
 	        }
-	       
 	       //计算目标函数值
 	       List<DoubleSolution> population = new ArrayList<>(maptable.length);
 	       for(int i = 0;i<maptable.length;i++){
@@ -253,17 +249,19 @@ public class SMOCrossover<S extends Solution<?>> implements CrossoverOperator<Do
 	    		   }
 	    	   }
 	    	   
+	    	   
 	    	   //----------------测试输出----------------------------------------------
-//	    	   for(int i=0;i<avgmap.length;i++){
-//	    		   System.out.print(valmap[i]+", ");
-//	    		   for(int s = 0;s<avgmap[i].length;s++){
-//	    			  
-//	    			   System.out.print(avgmap[i][s]+", ");
-//	    			   
-//	    		   }
-//	    		   System.out.println();
-//	    	   }
-//	    	   System.out.println("j:"+j+"-------------------------------------");
+	    	   System.out.println("函数均值矩阵:");
+	    	   for(int i=0;i<avgmap.length;i++){
+	    		   System.out.print(valmap[i]+", ");
+	    		   for(int s = 0;s<avgmap[i].length;s++){
+	    			  
+	    			   System.out.print(avgmap[i][s]+", ");
+	    			   
+	    		   }
+	    		   System.out.println();
+	    	   }
+	    	   System.out.println("j:"+j+"-------------------------------------");
 	    	   //------------------------------------------------------------------------
 	    	   
 	    	   
@@ -275,6 +273,7 @@ public class SMOCrossover<S extends Solution<?>> implements CrossoverOperator<Do
 	    			   if(avgrow != avgrow2){
 	    				   int dominacecount = 0;
 	    				   for(int avgcol = 0;avgcol<avgmap[0].length;avgcol++){
+	    					   
 	    					   //大于等于
 	    					   if(avgmap[avgrow][avgcol]>=avgmap[avgrow2][avgcol]){
 	    						   dominacecount++;
@@ -295,20 +294,31 @@ public class SMOCrossover<S extends Solution<?>> implements CrossoverOperator<Do
 	       
 	       
 	       //------------------测试输出------------------------------
-//	       for(int i=0;i<ress.size();i++){
-//	    	   System.out.println("i:"+i);
-//	    	   for(int j = 0;j<ress.get(i).size();j++){
-//	    		   System.out.print(ress.get(i).get(j)+", ");
-//	    	   }
-//	    	   System.out.println();
-//	       }
+	       System.out.println("非劣解集合：");
+	       for(int i=0;i<ress.size();i++){
+	    	   System.out.println("i:"+i);
+	    	   for(int j = 0;j<ress.get(i).size();j++){
+	    		   System.out.print(ress.get(i).get(j)+", ");
+	    	   }
+	    	   System.out.println();
+	       }
 	       //----------------------------------------------------------
 	       
 	       
 	       
 	       List<List<Double>> ant = new ArrayList<List<Double>>();
 	       recursive (ress,ant, 0, new ArrayList<Double>());
-	       List<DoubleSolution> pop = new ArrayList<>(ant.size());
+	       System.out.println("ant:"+ant.size());
+	       
+	       for(int i =0;i<ant.size();i++){
+	    	   for(int j = 0;j<ant.get(i).size();j++){
+	    		   System.out.print(ant.get(i).get(j));
+	    	   }
+	    	   System.out.println();
+	       }
+	       
+	       
+	       //List<DoubleSolution> pop = new ArrayList<>();
 	       if(ant.size()>0){
 	       for(int i = 0;i<ant.size();i++){
 	    	   DoubleSolution newIndividual = getProblem().createSolution();
@@ -316,18 +326,16 @@ public class SMOCrossover<S extends Solution<?>> implements CrossoverOperator<Do
 	    		   newIndividual.setVariableValue(j, ant.get(i).get(j));
 	    	   }
 	    	   getProblem().evaluate(newIndividual); //计算目标函数值赋值给solution.obj[]
-	    	   pop.add(newIndividual);
+	    	   offspring.add(newIndividual);
 	       }
 	       }
-	      if(pop.size()>10){
+	      if(offspring.size()>4){
 	    	    RankingAndCrowdingSelection<DoubleSolution> rankingAndCrowdingSelection ;
-	    	    rankingAndCrowdingSelection = new RankingAndCrowdingSelection<DoubleSolution>(10) ;
-	    	    offspring= rankingAndCrowdingSelection.execute(pop) ;
-	      }else{
-	    	  offspring = pop;
+	    	    rankingAndCrowdingSelection = new RankingAndCrowdingSelection<DoubleSolution>(4) ;
+	    	    offspring= rankingAndCrowdingSelection.execute(offspring) ;
 	      }
-	    }else{  //count<0  进行传统交叉操作
-	    	
+	    }
+	        if(offspring.size()<1) {  //count<0  进行传统交叉操作
 	    	  for (int i = 0; i < parent1.getNumberOfVariables(); i++) {
 	    	        valueX1 = parent1.getVariableValue(i);
 	    	        valueX2 = parent2.getVariableValue(i);
@@ -390,7 +398,8 @@ public class SMOCrossover<S extends Solution<?>> implements CrossoverOperator<Do
 	    	
 	    }
 	  }	 
-	      System.out.println("---------------------------");
+	      System.out.println("自适应正交交叉挑选的个体：");
+	      System.out.println("offspring.size"+offspring.size());
 	      for(int i = 0;i<offspring.size();i++){
 	    	  for(int j = 0;j<offspring.get(i).getNumberOfVariables();j++){
 	    		  System.out.print(offspring.get(i).getVariableValue(j)+", ");

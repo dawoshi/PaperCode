@@ -11,6 +11,7 @@ import org.uma.jmetal.operator.impl.mutation.PolynomialMutation;
 import org.uma.jmetal.operator.impl.selection.BinaryTournamentSelection;
 import org.uma.jmetal.problem.Problem;
 import org.uma.jmetal.problem.multiobjective.dtlz.DTLZ2;
+import org.uma.jmetal.problem.multiobjective.zdt.ZDT1;
 import org.uma.jmetal.problem.multiobjective.zdt.ZDT2;
 import org.uma.jmetal.runner.AbstractAlgorithmRunner;
 import org.uma.jmetal.solution.DoubleSolution;
@@ -62,14 +63,14 @@ public class NSGAIIRunner extends AbstractAlgorithmRunner {
       referenceParetoFront ="D:/codes/guoxinian/jMetal/jmetal-problem/src/test/resources/pareto_fronts/ZDT1.pf";
     }
 
-    problem = new ZDT2(); //ProblemUtils.<DoubleSolution> loadProblem(problemName);
+    problem = new ZDT1(); //ProblemUtils.<DoubleSolution> loadProblem(problemName);
 
     double crossoverProbability = 0.9 ;
     double crossoverDistributionIndex = 20.0 ;
-    //crossover = new SBXCrossover(crossoverProbability, crossoverDistributionIndex) ;
-    OrthogonalTable.setQ(3); //水平数
-    OrthogonalTable.setThreshold(0.7); //初始阈值
-    crossover = new SMOCrossover(crossoverProbability, crossoverDistributionIndex,problem);
+    crossover = new SBXCrossover(crossoverProbability, crossoverDistributionIndex) ;
+//    OrthogonalTable.setQ(3); //水平数
+//    OrthogonalTable.setThreshold(0.7); //初始阈值
+//    crossover = new SMOCrossover(crossoverProbability, crossoverDistributionIndex,problem);
     
     
     double mutationProbability = 1.0 / problem.getNumberOfVariables();
