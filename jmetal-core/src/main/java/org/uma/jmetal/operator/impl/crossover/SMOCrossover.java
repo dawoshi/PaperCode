@@ -99,8 +99,19 @@ public class SMOCrossover implements CrossoverOperator<DoubleSolution>{
 
 	    return doCrossover(crossoverProbability, solutions.get(0), solutions.get(1)) ;
 	  }
+	  
+	  
 
 	  /** do-selfadjust-Crossover method */
+	  /**
+	   * 
+	   *@author William.guo <guoxinian@aliyun.com> 
+	   * 
+	   * @param probability
+	   * @param parent1
+	   * @param parent2
+	   * @return
+	   */
 	  public List<DoubleSolution> doCrossover(double probability, DoubleSolution parent1, DoubleSolution parent2) {
 	    List<DoubleSolution> offspring = new ArrayList<DoubleSolution>();
 	    offspring.add((DoubleSolution) parent1.copy()) ;
@@ -118,8 +129,8 @@ public class SMOCrossover implements CrossoverOperator<DoubleSolution>{
 	        valueX1 = parent1.getVariableValue(i);
 	        valueX2 = parent2.getVariableValue(i);
 	        
-	        //生成【parent1，paarent2】之间的 up-low数组
 	        
+	        //生成【parent1，paarent2】之间的 up-low数组
 	        if(valueX1>=valueX2){
 	        	up[i] = valueX1;
 	        	low[i] = valueX2;
@@ -307,7 +318,7 @@ public class SMOCrossover implements CrossoverOperator<DoubleSolution>{
 	       
 	       
 	       List<List<Double>> ant = new ArrayList<List<Double>>();
-	       recursive (ress,ant, 0, new ArrayList<Double>());
+	       ant = recursive (ress);
 	       System.out.println("ant:"+ant.size());
 	       
 	       for(int i =0;i<ant.size();i++){
@@ -427,29 +438,43 @@ public class SMOCrossover implements CrossoverOperator<DoubleSolution>{
 		this.problem = problem;
 	}
      
-	
-	//笛卡尔积
-	private static void recursive (List<List<Double>> dimValue, List<List<Double>> result, int layer, List<Double> curList) {  
-        if (layer < dimValue.size() - 1) {  
-            if (dimValue.get(layer).size() == 0) {  
-                recursive(dimValue, result, layer + 1, curList);  
-            } else {  
-                for (int i = 0; i < dimValue.get(layer).size(); i++) {  
-                    List<Double> list = new ArrayList<Double>(curList);  
-                    list.add(dimValue.get(layer).get(i));  
-                    recursive(dimValue, result, layer + 1, list);  
-                }  
-            }  
-        } else if (layer == dimValue.size() - 1) {  
-            if (dimValue.get(layer).size() == 0) {  
-                result.add(curList);  
-            } else {  
-                for (int i = 0; i < dimValue.get(layer).size(); i++) {  
-                    List<Double> list = new ArrayList<Double>(curList);  
-                    list.add(dimValue.get(layer).get(i));  
-                    result.add(list);  
-                }  
-            }  
-        }  
-    }  
+	 private static List<List<Double>> recursive (List<List<Double>> dimValue) {  
+	        int total = 1;  
+	        for (List<Double> list : dimValue) {  
+	            total *= list.size();  
+	        }  
+	        List<List<Double>> myResult = new ArrayList<List<Double>>();
+	        int itemLoopNum = 1;  
+	        int loopPerItem = 1;  
+	        int now = 1;  
+	        for (List<Double> list : dimValue) {  
+	            now *= list.size();  
+	  
+	            int index = 0;  
+	            int currentSize = list.size();  
+	  
+	            itemLoopNum = total / now;  
+	            loopPerItem = total / (itemLoopNum * currentSize);  
+	            int myIndex = 0;  
+	            for (Double string : list) {  
+	                for (int i = 0; i < loopPerItem; i++) {
+	                    if (myIndex == list.size()) {  
+	                        myIndex = 0;  
+	                    }  
+	                    for (int j = 0; j < itemLoopNum; j++) {
+	                    	if(index>myResult.size()-1){
+	                    		List<Double> tmp = new ArrayList<Double>();
+	                    		tmp.add(list.get(myIndex));
+	                    		myResult.add(tmp);
+	                    	}else{
+	                    		myResult.get(index).add(list.get(myIndex));
+	                    	}
+	                        index++;  
+	                    }  
+	                    myIndex++;  
+	                }  
+	            }  
+	        }  
+	        return myResult;
+	    }	
 	}

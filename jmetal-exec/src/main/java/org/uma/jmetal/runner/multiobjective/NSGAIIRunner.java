@@ -45,14 +45,7 @@ public class NSGAIIRunner extends AbstractAlgorithmRunner {
     MutationOperator<DoubleSolution> mutation;
     SelectionOperator<List<DoubleSolution>, DoubleSolution> selection;
     String referenceParetoFront = "" ;
-
     String problemName ;
-    
-    
-    //problemName = "org.uma.jmetal.problem.multiobjective.zdt.ZDT1";
-   // referenceParetoFront = "D:/codes/guoxinian/jMetal/jmetal-problem/src/test/resources/pareto_fronts/ZDT1.pf" ;
-    
-    
     if (args.length == 1) {
       problemName = args[0];
     } else if (args.length == 2) {
@@ -77,8 +70,9 @@ public class NSGAIIRunner extends AbstractAlgorithmRunner {
 
       algorithm = new NSGAIIBuilder<DoubleSolution>(problem, crossover, mutation)
         .setSelectionOperator(selection)
-        .setMaxEvaluations(300) //最大评估代数
-        .setPopulationSize(300) //种群个体数量
+        //迭代代数 = 最大评估次数/种群大小
+        .setMaxEvaluations(30000) //最大评估代数  300次 
+        .setPopulationSize(100) //种群个体数量
         .build() ;
 
     AlgorithmRunner algorithmRunner = new AlgorithmRunner.Executor(algorithm)
@@ -91,6 +85,7 @@ public class NSGAIIRunner extends AbstractAlgorithmRunner {
 
     printFinalSolutionSet(population);
     System.out.println(referenceParetoFront);
+    System.out.println("last:indicators");
     if (!referenceParetoFront.equals("")) {
       printQualityIndicators(population, referenceParetoFront) ;
     }
