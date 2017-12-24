@@ -44,9 +44,9 @@ public class MOEADBuilder implements AlgorithmBuilder<AbstractMOEAD<DoubleSoluti
   /** Constructor */
   public MOEADBuilder(Problem<DoubleSolution> problem, Variant variant) {
     this.problem = problem ;
-    populationSize = 300 ;
-    resultPopulationSize = 300 ;
-    maxEvaluations = 150000 ;
+    populationSize = 100 ;
+    resultPopulationSize = 100 ;
+    maxEvaluations = 25001 ;
     crossover = new DifferentialEvolutionCrossover() ;
     mutation = new PolynomialMutation(1.0/problem.getNumberOfVariables(), 20.0);
     functionType = MOEAD.FunctionType.TCHE ;

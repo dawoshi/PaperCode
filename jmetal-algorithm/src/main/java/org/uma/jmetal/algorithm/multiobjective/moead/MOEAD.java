@@ -9,6 +9,7 @@ import org.uma.jmetal.operator.MutationOperator;
 import org.uma.jmetal.operator.impl.crossover.DifferentialEvolutionCrossover;
 import org.uma.jmetal.problem.Problem;
 import org.uma.jmetal.solution.DoubleSolution;
+import org.uma.jmetal.util.JMetalLogger;
 
 /**
  * Class implementing the MOEA/D-DE algorithm described in :
@@ -22,6 +23,9 @@ import org.uma.jmetal.solution.DoubleSolution;
 @SuppressWarnings("serial")
 public class MOEAD extends AbstractMOEAD<DoubleSolution> {
   protected DifferentialEvolutionCrossover differentialEvolutionCrossover ;
+  protected String referenceParetoFront ="D:/codes/guoxinian/jMetal/jmetal-problem/src/test/resources/pareto_fronts/ZDT6.pf";
+
+  protected String indicationPath ="MOEAD.csv";
 
   public MOEAD(Problem<DoubleSolution> problem,
       int populationSize,
@@ -64,12 +68,21 @@ public class MOEAD extends AbstractMOEAD<DoubleSolution> {
         DoubleSolution child = children.get(0) ;
         mutationOperator.execute(child);
         problem.evaluate(child);
-
         evaluations++;
 
         updateIdealPoint(child);
         updateNeighborhood(child, subProblemId, neighborType);
+        
       }
+      List<DoubleSolution> p = getResult();
+      try {
+      	JMetalLogger.printLog((List<DoubleSolution>)p, referenceParetoFront, indicationPath);
+      	
+  	} catch (Exception e) {
+  		// TODO Auto-generated catch block
+  		e.printStackTrace();
+  	}
+      
     } while (evaluations < maxEvaluations);
 
   }

@@ -1,13 +1,24 @@
 package org.uma.jmetal.experiment;
 
 import org.uma.jmetal.algorithm.Algorithm;
+import org.uma.jmetal.algorithm.multiobjective.moead.AbstractMOEAD;
+import org.uma.jmetal.algorithm.multiobjective.moead.MOEADBuilder;
 import org.uma.jmetal.algorithm.multiobjective.nsgaii.NSGAIIBuilder;
 import org.uma.jmetal.algorithm.multiobjective.smpso.SMPSOBuilder;
 import org.uma.jmetal.algorithm.multiobjective.spea2.SPEA2Builder;
+import org.uma.jmetal.operator.MutationOperator;
+import org.uma.jmetal.operator.impl.crossover.DifferentialEvolutionCrossover;
 import org.uma.jmetal.operator.impl.crossover.SBXCrossover;
 import org.uma.jmetal.operator.impl.mutation.PolynomialMutation;
 import org.uma.jmetal.problem.DoubleProblem;
 import org.uma.jmetal.problem.Problem;
+import org.uma.jmetal.problem.multiobjective.dtlz.DTLZ1;
+import org.uma.jmetal.problem.multiobjective.dtlz.DTLZ2;
+import org.uma.jmetal.problem.multiobjective.dtlz.DTLZ3;
+import org.uma.jmetal.problem.multiobjective.dtlz.DTLZ4;
+import org.uma.jmetal.problem.multiobjective.dtlz.DTLZ5;
+import org.uma.jmetal.problem.multiobjective.dtlz.DTLZ6;
+import org.uma.jmetal.problem.multiobjective.dtlz.DTLZ7;
 import org.uma.jmetal.problem.multiobjective.zdt.ZDT1;
 import org.uma.jmetal.problem.multiobjective.zdt.ZDT2;
 import org.uma.jmetal.problem.multiobjective.zdt.ZDT3;
@@ -62,13 +73,14 @@ import java.util.List;
  */
 public class ZDTStudy2 {
 
-  private static final int INDEPENDENT_RUNS = 5 ;
+  private static final int INDEPENDENT_RUNS = 30 ;
 
   public static void main(String[] args) throws IOException {
-    if (args.length != 1) {
-      throw new JMetalException("Needed arguments: experimentBaseDirectory") ;
-    }
-    String experimentBaseDirectory = args[0] ;
+//    if (args.length != 1) {
+//      throw new JMetalException("Needed arguments: experimentBaseDirectory") ;
+//    }
+    //String experimentBaseDirectory = "D:/codes/guoxinian/" ;
+    String experimentBaseDirectory="C:/Users/William/Desktop/data/";
 
     List<ExperimentProblem<DoubleSolution>> problemList = new ArrayList<>();
     problemList.add(new ExperimentProblem<>(new ZDT1()));
@@ -76,6 +88,13 @@ public class ZDTStudy2 {
     problemList.add(new ExperimentProblem<>(new ZDT3()));
     problemList.add(new ExperimentProblem<>(new ZDT4()));
     problemList.add(new ExperimentProblem<>(new ZDT6()));
+    problemList.add(new ExperimentProblem<>(new DTLZ1()));
+    problemList.add(new ExperimentProblem<>(new DTLZ2()));
+    problemList.add(new ExperimentProblem<>(new DTLZ3()));
+    problemList.add(new ExperimentProblem<>(new DTLZ4()));
+    problemList.add(new ExperimentProblem<>(new DTLZ5()));
+    problemList.add(new ExperimentProblem<>(new DTLZ6()));
+    problemList.add(new ExperimentProblem<>(new DTLZ7()));
 
     List<ExperimentAlgorithm<DoubleSolution, List<DoubleSolution>>> algorithmList =
             configureAlgorithmList(problemList);
@@ -145,13 +164,32 @@ public class ZDTStudy2 {
     }
 
     for (int i = 0; i < problemList.size(); i++) {
-      Algorithm<List<DoubleSolution>> algorithm = new SPEA2Builder<DoubleSolution>(
-              problemList.get(i).getProblem(),
-              new SBXCrossover(1.0, 10.0),
-              new PolynomialMutation(1.0 / problemList.get(i).getProblem().getNumberOfVariables(), 20.0))
-              .build();
-      algorithms.add(new ExperimentAlgorithm<>(algorithm, problemList.get(i).getTag()));
-    }
+	      double cr = 1.0 ;
+	      double f = 0.5 ;
+	      Problem<DoubleSolution> problem = problemList.get(i).getProblem();
+	      MutationOperator<DoubleSolution> mutation;
+	      DifferentialEvolutionCrossover crossover;
+	      
+	      crossover = new DifferentialEvolutionCrossover(cr, f, "rand/1/bin");
+
+	      double mutationProbability = 1.0 / problem.getNumberOfVariables();
+	      double mutationDistributionIndex = 20.0;
+	      mutation = new PolynomialMutation(mutationProbability, mutationDistributionIndex);
+
+	      Algorithm<List<DoubleSolution>> algorithm = new MOEADBuilder(problem, MOEADBuilder.Variant.MOEAD)
+	              .setCrossover(crossover)
+	              .setMutation(mutation)
+	              .setMaxEvaluations(25000)
+	              .setPopulationSize(100)
+	              .setResultPopulationSize(100)
+	              .setNeighborhoodSelectionProbability(0.9)
+	              .setMaximumNumberOfReplacedSolutions(2)
+	              .setNeighborSize(20)
+	              .setFunctionType(AbstractMOEAD.FunctionType.TCHE)
+	              .setDataDirectory("MOEAD_Weights")
+	              .build();
+	      algorithms.add(new ExperimentAlgorithm<>(algorithm, problemList.get(i).getTag()));
+	    }
 
     return algorithms ;
   }

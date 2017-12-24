@@ -18,6 +18,7 @@ import org.uma.jmetal.util.ProblemUtils;
 import org.uma.jmetal.util.fileoutput.SolutionListOutput;
 import org.uma.jmetal.util.fileoutput.impl.DefaultFileOutputContext;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 
 /**
@@ -26,6 +27,7 @@ import java.util.List;
 public class NSGAIIIRunner extends AbstractAlgorithmRunner {
   /**
    * @param args Command line arguments.
+ * @throws FileNotFoundException 
    * @throws java.io.IOException
    * @throws SecurityException
    * @throws ClassNotFoundException
@@ -34,14 +36,18 @@ public class NSGAIIIRunner extends AbstractAlgorithmRunner {
    *        - org.uma.jmetal.runner.multiobjective.NSGAIIIRunner problemName
    *        - org.uma.jmetal.runner.multiobjective.NSGAIIIRunner problemName paretoFrontFile
    */
-  public static void main(String[] args) throws JMetalException {
+  public static void main(String[] args) throws JMetalException, FileNotFoundException {
 	    Problem<DoubleSolution> problem;
 	    Algorithm<List<DoubleSolution>> algorithm;
 	    CrossoverOperator<DoubleSolution> crossover;
 	    MutationOperator<DoubleSolution> mutation;
 	    SelectionOperator<List<DoubleSolution>, DoubleSolution> selection;
+	    
+	    
+	    String referenceParetoFront = "" ;
+	    referenceParetoFront ="D:/codes/guoxinian/jMetal/jmetal-problem/src/test/resources/pareto_fronts/ZDT1.pf";
 
-    String problemName = "org.uma.jmetal.problem.multiobjective.dtlz.DTLZ1" ;
+    String problemName = "org.uma.jmetal.problem.multiobjective.zdt.ZDT1" ;
 
     problem = ProblemUtils.loadProblem(problemName);
     
@@ -59,7 +65,7 @@ public class NSGAIIIRunner extends AbstractAlgorithmRunner {
             .setCrossoverOperator(crossover)
             .setMutationOperator(mutation)
             .setSelectionOperator(selection)
-            .setMaxIterations(500)
+            .setMaxIterations(300)
             .build() ;
 
     AlgorithmRunner algorithmRunner = new AlgorithmRunner.Executor(algorithm)
@@ -73,6 +79,12 @@ public class NSGAIIIRunner extends AbstractAlgorithmRunner {
             .setVarFileOutputContext(new DefaultFileOutputContext("VAR.tsv"))
             .setFunFileOutputContext(new DefaultFileOutputContext("FUN.tsv"))
             .print() ;
+    printFinalSolutionSet(population);
+    System.out.println(referenceParetoFront);
+    System.out.println("last:indicators");
+    if (!referenceParetoFront.equals("")) {
+      printQualityIndicators(population, referenceParetoFront) ;
+    }
 
     JMetalLogger.logger.info("Total execution time: " + computingTime + "ms");
     JMetalLogger.logger.info("Objectives values have been written to file FUN.tsv");

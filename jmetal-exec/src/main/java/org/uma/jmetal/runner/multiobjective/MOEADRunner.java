@@ -42,8 +42,9 @@ public class MOEADRunner extends AbstractAlgorithmRunner {
       problemName = args[0] ;
       referenceParetoFront = args[1] ;
     } else {
-      problemName = "org.uma.jmetal.problem.multiobjective.UF.UF1";
-      referenceParetoFront = "jmetal-problem/src/test/resources/pareto_fronts/UF1.pf";
+      problemName = "org.uma.jmetal.problem.multiobjective.zdt.ZDT6";
+       referenceParetoFront ="D:/codes/guoxinian/jMetal/jmetal-problem/src/test/resources/pareto_fronts/ZDT6.pf";
+      //referenceParetoFront = "jmetal-problem/src/test/resources/pareto_fronts/ZDT1.pf";
     }
 
     problem = (DoubleProblem)ProblemUtils.<DoubleSolution> loadProblem(problemName);
@@ -59,7 +60,7 @@ public class MOEADRunner extends AbstractAlgorithmRunner {
     algorithm = new MOEADBuilder(problem, MOEADBuilder.Variant.MOEAD)
             .setCrossover(crossover)
             .setMutation(mutation)
-            .setMaxEvaluations(150000)
+            .setMaxEvaluations(25001)
             .setPopulationSize(100)
             .setResultPopulationSize(100)
             .setNeighborhoodSelectionProbability(0.9)

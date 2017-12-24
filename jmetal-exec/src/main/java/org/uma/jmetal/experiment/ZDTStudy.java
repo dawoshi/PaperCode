@@ -1,9 +1,13 @@
 package org.uma.jmetal.experiment;
 
 import org.uma.jmetal.algorithm.Algorithm;
+import org.uma.jmetal.algorithm.multiobjective.moead.AbstractMOEAD;
+import org.uma.jmetal.algorithm.multiobjective.moead.MOEADBuilder;
 import org.uma.jmetal.algorithm.multiobjective.nsgaii.NSGAIIBuilder;
 import org.uma.jmetal.algorithm.multiobjective.smpso.SMPSOBuilder;
 import org.uma.jmetal.algorithm.multiobjective.spea2.SPEA2Builder;
+import org.uma.jmetal.operator.MutationOperator;
+import org.uma.jmetal.operator.impl.crossover.DifferentialEvolutionCrossover;
 import org.uma.jmetal.operator.impl.crossover.SBXCrossover;
 import org.uma.jmetal.operator.impl.mutation.PolynomialMutation;
 import org.uma.jmetal.problem.DoubleProblem;
@@ -45,13 +49,13 @@ import java.util.List;
  */
 
 public class ZDTStudy {
-  private static final int INDEPENDENT_RUNS = 10;
+  private static final int INDEPENDENT_RUNS = 30;
 
   public static void main(String[] args) throws IOException {
-    if (args.length != 1) {
-      throw new JMetalException("Missing argument: experimentBaseDirectory");
-    }
-    String experimentBaseDirectory = args[0];
+//    if (args.length != 1) {
+//      throw new JMetalException("Missing argument: experimentBaseDirectory");
+//    }
+    String experimentBaseDirectory = "C:/Users/William/Desktop/data/";
 
     List<ExperimentProblem<DoubleSolution>> problemList = new ArrayList<>();
     problemList.add(new ExperimentProblem<>(new ZDT1()));
@@ -69,7 +73,7 @@ public class ZDTStudy {
             new ExperimentBuilder<DoubleSolution, List<DoubleSolution>>("ZDTStudy")
                     .setAlgorithmList(algorithmList)
                     .setProblemList(problemList)
-                    .setReferenceFrontDirectory("/pareto_fronts")
+                    .setReferenceFrontDirectory("D:/codes/guoxinian/PaperCode/jmetal-problem/src/test/resources/pareto_fronts")
                     .setReferenceFrontFileNames(referenceFrontFileNames)
                     .setExperimentBaseDirectory(experimentBaseDirectory)
                     .setOutputParetoFrontFileName("FUN")
@@ -131,6 +135,34 @@ public class ZDTStudy {
               .build();
       algorithms.add(new ExperimentAlgorithm<>(algorithm, problemList.get(i).getTag()));
     }
+    
+    for (int i = 0; i < problemList.size(); i++) {
+	      double cr = 1.0 ;
+	      double f = 0.5 ;
+	      Problem<DoubleSolution> problem = problemList.get(i).getProblem();
+	      MutationOperator<DoubleSolution> mutation;
+	      DifferentialEvolutionCrossover crossover;
+	      
+	      crossover = new DifferentialEvolutionCrossover(cr, f, "rand/1/bin");
+
+	      double mutationProbability = 1.0 / problem.getNumberOfVariables();
+	      double mutationDistributionIndex = 20.0;
+	      mutation = new PolynomialMutation(mutationProbability, mutationDistributionIndex);
+
+	      Algorithm<List<DoubleSolution>> algorithm = new MOEADBuilder(problem, MOEADBuilder.Variant.MOEAD)
+	              .setCrossover(crossover)
+	              .setMutation(mutation)
+	              .setMaxEvaluations(25000)
+	              .setPopulationSize(100)
+	              .setResultPopulationSize(100)
+	              .setNeighborhoodSelectionProbability(0.9)
+	              .setMaximumNumberOfReplacedSolutions(2)
+	              .setNeighborSize(20)
+	              .setFunctionType(AbstractMOEAD.FunctionType.TCHE)
+	              .setDataDirectory("MOEAD_Weights")
+	              .build();
+	      algorithms.add(new ExperimentAlgorithm<>(algorithm, problemList.get(i).getTag()));
+	    }
 
     return algorithms;
   }

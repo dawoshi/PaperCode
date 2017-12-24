@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -204,16 +205,16 @@ public class SMOCrossover implements CrossoverOperator<DoubleSolution>{
 	    					}
 	    					if (t2<parent1.getNumberOfVariables()&&status[t2] == true)
 	    					{
-	    						int temp21 = map.get(t2);//record_statue[t2];//取出status列 对应的正交表的列
-	    						int temp22 = orthogonaltable[i][temp21];//pop[temp21].col_length[i];//取出正交表中对应的离散化矩阵的位置
-	    						maptable[i][j] = disArray[temp22-1][j];//out_array[j].col_length[i] = value_arry[j].col_length[temp22];
+	    						int temp21 = map.get(t2);////取出status列 对应的正交表的列
+	    						int temp22 = orthogonaltable[i][temp21];//取出正交表中对应的离散化矩阵的位置
+	    						maptable[i][j] = disArray[temp22-1][j];
 	    					}
 	    				}
 	    				else//左边找到
 	    				{
-	    					int temp31 = map.get(t1);//record_statue[t1];
-	    					int temp32 = orthogonaltable[i][temp31];//pop[temp31].col_length[i];//取出正交表中对应的离散化矩阵的位置
-	    					maptable[i][j] = disArray[temp32-1][j];// out_array[j].col_length[i] = value_arry[j].col_length[temp32];
+	    					int temp31 = map.get(t1);
+	    					int temp32 = orthogonaltable[i][temp31];//取出正交表中对应的离散化矩阵的位置
+	    					maptable[i][j] = disArray[temp32-1][j];
 	    				}
 	        		}
 	        	}
@@ -229,8 +230,6 @@ public class SMOCrossover implements CrossoverOperator<DoubleSolution>{
 	    	   getProblem().evaluate(newIndividual); //计算目标函数值赋值给solution.obj[]
 	    	   population.add(newIndividual);
 	       }
-	       
-	       System.out.println("Q:"+OrthogonalTable.getQ());
 	       
 	       List<List<Double>> ress = new ArrayList<List<Double>>();
 	       //获取目标函数值
@@ -262,74 +261,98 @@ public class SMOCrossover implements CrossoverOperator<DoubleSolution>{
 	    	   
 	    	   
 	    	   //----------------测试输出----------------------------------------------
-	    	   System.out.println("函数均值矩阵:");
-	    	   for(int i=0;i<avgmap.length;i++){
-	    		   System.out.print(valmap[i]+", ");
-	    		   for(int s = 0;s<avgmap[i].length;s++){
-	    			  
-	    			   System.out.print(avgmap[i][s]+", ");
-	    			   
-	    		   }
-	    		   System.out.println();
-	    	   }
-	    	   System.out.println("j:"+j+"-------------------------------------");
+//	    	   System.out.println("------------------------------------------------");
+//	    	   System.out.println("函数均值矩阵:");
+//	    	   for(int i=0;i<avgmap.length;i++){
+//	    		   System.out.print(valmap[i]+", ");
+//	    		   for(int s = 0;s<avgmap[i].length;s++){
+//	    			  
+//	    			   System.out.print(avgmap[i][s]+", ");
+//	    			   
+//	    		   }
+//	    		   System.out.println();
+//	    	   }
+//	    	   System.out.println("j:"+j+"-------------------------------------");
 	    	   //------------------------------------------------------------------------
 	    	   
 	    	   
+	    	   //求均值非支配
+	    	   Set<Double> tmp = new HashSet<Double>();
+	    	   List<Double> res = new ArrayList<Double>();
 	    	   
-	    	   ArrayList<Double> res = new ArrayList<Double>();
-	    	   for(int avgrow =0;avgrow<avgmap.length;avgrow++){
+	    	   for(int avgrow =0;avgrow<avgmap.length;avgrow++){ //每一因素对应水平数个数
 	    		   boolean flag = false;
+	    		   int equalnumber =0;
 	    		   for(int avgrow2 = 0;avgrow2<avgmap.length;avgrow2++){
 	    			   if(avgrow != avgrow2){
 	    				   int dominacecount = 0;
+	    				   int equalCount = 0;
 	    				   for(int avgcol = 0;avgcol<avgmap[0].length;avgcol++){
-	    					   
-	    					   //大于等于
+	    					   //大于等于(只要有一个大于等于他的就不加入)
 	    					   if(avgmap[avgrow][avgcol]>=avgmap[avgrow2][avgcol]){
 	    						   dominacecount++;
 	    					   }
+	    					   if(avgmap[avgrow][avgcol]==avgmap[avgrow2][avgcol]){
+	    						   equalCount++;
+	    					   }
+	    					   
 	    				   }
 	    				   if(dominacecount == parent1.getNumberOfObjectives()){
 	    					   flag = true;
-	    				   } 
+	    				   }
+	    				   if(equalCount == parent1.getNumberOfObjectives()){
+	    					   equalnumber++;
+	    				   }
+	    				  
 	    			   }
 	    		   }
-	    		   if(flag == false){
-	    			   res.add(valmap[avgrow]); 
+	    		   if(flag == false ||(equalnumber == avgmap.length-1)){
+	    			   if(!tmp.contains(valmap[avgrow])){
+	    				   res.add(valmap[avgrow]);
+	    			   }
+	    			   tmp.add(valmap[avgrow]); 
 	    		   }
 	    	   }
+	    	   for(int i = 0;i<res.size();i++){
+	    		   System.out.print(res.get(i));
+	    	   }
+	    	   System.out.println();
 	    	   ress.add(res);
+	    	   tmp=null;
+	    	   res=null;
 	       }
-	       
-	       
-	       
 	       //------------------测试输出------------------------------
-	       System.out.println("非劣解集合：");
-	       for(int i=0;i<ress.size();i++){
-	    	   System.out.println("i:"+i);
-	    	   for(int j = 0;j<ress.get(i).size();j++){
-	    		   System.out.print(ress.get(i).get(j)+", ");
-	    	   }
-	    	   System.out.println();
-	       }
+//	       System.out.println("-----------------------------------------");
+//	       System.out.println("非劣解集合：");
+//	       for(int i=0;i<ress.size();i++){
+//	    	   System.out.println("i:"+i);
+//	    	   for(int j = 0;j<ress.get(i).size();j++){
+//	    		   System.out.print(ress.get(i).get(j)+", ");
+//	    	   }
+//	    	   System.out.println();
+//	       }
 	       //----------------------------------------------------------
-	       
-	       
-	       
+
 	       List<List<Double>> ant = new ArrayList<List<Double>>();
-	       ant = recursive (ress);
-	       System.out.println("ant:"+ant.size());
 	       
-	       for(int i =0;i<ant.size();i++){
-	    	   for(int j = 0;j<ant.get(i).size();j++){
-	    		   System.out.print(ant.get(i).get(j));
-	    	   }
-	    	   System.out.println();
+	       //笛卡尔积计算
+	       if(ress.size()==parent1.getNumberOfVariables()){
+	    	   ant = recursive (ress);
+	       
+	       //输出笛卡尔积生成的种群大小
+	    	   System.out.println("输出笛卡尔积生成的种群大小 ant:"+ant.size());
+	       }else{
+	    	   System.out.println("ress.siz():"+ress.size());
 	       }
 	       
+//	       for(int i =0;i<ant.size();i++){
+//	    	   for(int j = 0;j<ant.get(i).size();j++){
+//	    		   System.out.print(ant.get(i).get(j));
+//	    	   }
+//	    	   System.out.println();
+//	       }
 	       
-	       //List<DoubleSolution> pop = new ArrayList<>();
+	       
 	       if(ant.size()>0){
 	       for(int i = 0;i<ant.size();i++){
 	    	   DoubleSolution newIndividual = getProblem().createSolution();
@@ -340,13 +363,43 @@ public class SMOCrossover implements CrossoverOperator<DoubleSolution>{
 	    	   offspring.add(newIndividual);
 	       }
 	       }
-	      if(offspring.size()>4){
+	      if(offspring.size()>2){
+	    	  System.out.println("自适应方法：");
 	    	    RankingAndCrowdingSelection<DoubleSolution> rankingAndCrowdingSelection ;
-	    	    rankingAndCrowdingSelection = new RankingAndCrowdingSelection<DoubleSolution>(4) ;
-	    	    offspring= rankingAndCrowdingSelection.execute(offspring) ;
+	    	   
+	    	    rankingAndCrowdingSelection = new RankingAndCrowdingSelection<DoubleSolution>(2) ;
+	    	    
+	    	    if(offspring.size()/100>3&& offspring.size()>4){
+	    	    	List<DoubleSolution> res= new ArrayList<DoubleSolution>();
+	    	    	List<DoubleSolution> tmp= new ArrayList<DoubleSolution>();
+	    	    	List<DoubleSolution> tmpp= new ArrayList<DoubleSolution>();
+	    	    	RankingAndCrowdingSelection<DoubleSolution> rankingAndCrowding = new RankingAndCrowdingSelection<DoubleSolution>(4) ;
+	    	    	for(int i =0;i<offspring.size();i++){
+	    	    		System.out.println("i:"+i);
+	    	    		tmp.add(offspring.get(i));
+	    	    		if((i%100 == 0) &&(i!=0)){
+	    	    			tmpp = rankingAndCrowding.execute(tmp);
+	    	    			for(int j=0;j<tmpp.size();j++){
+	    	    				res.add(tmpp.get(j));
+	    	    			}
+	    	    			tmp.clear();
+	    	    		}	
+	    	    	}
+	    	    	if(res.size()>300){
+	    	    		List<DoubleSolution> re= new ArrayList<DoubleSolution>();
+	    	    		JMetalRandom random = JMetalRandom.getInstance();
+	    	    		for(int i = 0;i<100;i++){
+	    	    			re.add(res.get(random.nextInt(0, res.size()-1)));
+	    	    		}
+	    	    		return rankingAndCrowdingSelection.execute(re);
+	    	    	}
+	    	    	return rankingAndCrowdingSelection.execute(res);
+	    	    }
+	    	    return rankingAndCrowdingSelection.execute(offspring);
 	      }
 	    }
-	        if(offspring.size()<1) {  //count<0  进行传统交叉操作
+	        if(offspring.size()<1 ) {  //count<0  进行传统交叉操作
+	        	System.out.println("非自适应交叉");
 	    	  for (int i = 0; i < parent1.getNumberOfVariables(); i++) {
 	    	        valueX1 = parent1.getVariableValue(i);
 	    	        valueX2 = parent2.getVariableValue(i);
@@ -406,17 +459,18 @@ public class SMOCrossover implements CrossoverOperator<DoubleSolution>{
 	    	          offspring.get(1).setVariableValue(i, valueX2);
 	    	        }
 	    	      }
-	    	
-	    }
-	  }	 
-	      System.out.println("自适应正交交叉挑选的个体：");
-	      System.out.println("offspring.size"+offspring.size());
-	      for(int i = 0;i<offspring.size();i++){
-	    	  for(int j = 0;j<offspring.get(i).getNumberOfVariables();j++){
-	    		  System.out.print(offspring.get(i).getVariableValue(j)+", ");
-	    	  }
-	    	  System.out.println();
-	      }
+	    
+	    	  System.out.println("-------------------------------------------");
+	 	      System.out.println("普通方法挑选的个体：");
+	 	      System.out.println("offspring.size"+offspring.size());
+	 	      for(int i = 0;i<offspring.size();i++){
+	 	    	  for(int j = 0;j<offspring.get(i).getNumberOfVariables();j++){
+	 	    		  System.out.print(offspring.get(i).getVariableValue(j)+", ");
+	 	    	  }
+	 	    	  System.out.println();
+	 	      }
+	        }
+	  }
 	    return offspring;
 	  }
 
@@ -439,29 +493,31 @@ public class SMOCrossover implements CrossoverOperator<DoubleSolution>{
 	}
      
 	 private static List<List<Double>> recursive (List<List<Double>> dimValue) {  
-	        int total = 1;  
-	        for (List<Double> list : dimValue) {  
+	        long total = 1;  
+	        for (List<Double> list : dimValue) { 
+	        	System.out.println("list.size():"+list.size());
 	            total *= list.size();  
 	        }  
-	        List<List<Double>> myResult = new ArrayList<List<Double>>();
-	        int itemLoopNum = 1;  
-	        int loopPerItem = 1;  
-	        int now = 1;  
+	        List<List<Double>> myResult = new LinkedList<List<Double>>();
+	        long itemLoopNum = 1;  
+	        long loopPerItem = 1;  
+	        long now = 1;  
 	        for (List<Double> list : dimValue) {  
 	            now *= list.size();  
 	  
 	            int index = 0;  
-	            int currentSize = list.size();  
-	  
+	            long currentSize = list.size();  
+	            
+	            System.out.println("total:"+total+","+"now:"+now);
 	            itemLoopNum = total / now;  
 	            loopPerItem = total / (itemLoopNum * currentSize);  
 	            int myIndex = 0;  
-	            for (Double string : list) {  
-	                for (int i = 0; i < loopPerItem; i++) {
+	            for (long it = 0;it< list.size();it++) {  
+	                for (long i = 0; i < loopPerItem; i++) {
 	                    if (myIndex == list.size()) {  
 	                        myIndex = 0;  
 	                    }  
-	                    for (int j = 0; j < itemLoopNum; j++) {
+	                    for (long j = 0; j < itemLoopNum; j++) {
 	                    	if(index>myResult.size()-1){
 	                    		List<Double> tmp = new ArrayList<Double>();
 	                    		tmp.add(list.get(myIndex));

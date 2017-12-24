@@ -10,9 +10,13 @@ import org.uma.jmetal.operator.impl.crossover.SMOCrossover;
 import org.uma.jmetal.operator.impl.mutation.PolynomialMutation;
 import org.uma.jmetal.operator.impl.selection.BinaryTournamentSelection;
 import org.uma.jmetal.problem.Problem;
+import org.uma.jmetal.problem.multiobjective.dtlz.DTLZ1;
 import org.uma.jmetal.problem.multiobjective.dtlz.DTLZ2;
 import org.uma.jmetal.problem.multiobjective.zdt.ZDT1;
 import org.uma.jmetal.problem.multiobjective.zdt.ZDT2;
+import org.uma.jmetal.problem.multiobjective.zdt.ZDT3;
+import org.uma.jmetal.problem.multiobjective.zdt.ZDT4;
+import org.uma.jmetal.problem.multiobjective.zdt.ZDT6;
 import org.uma.jmetal.runner.AbstractAlgorithmRunner;
 import org.uma.jmetal.solution.DoubleSolution;
 import org.uma.jmetal.util.AlgorithmRunner;
@@ -47,16 +51,20 @@ public class My_DE_Runner extends AbstractAlgorithmRunner{/**
 	      problemName = args[0] ;
 	      referenceParetoFront = args[1] ;
 	    } else {
-	      problemName = "org.uma.jmetal.problem.multiobjective.zdt.ZDT1";
-	      referenceParetoFront ="D:/codes/guoxinian/jMetal/jmetal-problem/src/test/resources/pareto_fronts/ZDT1.pf";
+	      problemName = "org.uma.jmetal.problem.multiobjective.dtlz.DTLZ1";
+	      referenceParetoFront ="D:/codes/guoxinian/jMetal/jmetal-problem/src/test/resources/pareto_fronts/DTLZ1.3D.pf";
 	    }
 
-	    problem = new ZDT1(); //ProblemUtils.<DoubleSolution> loadProblem(problemName);
+	    problem = new DTLZ1(); //ProblemUtils.<DoubleSolution> loadProblem(problemName);
 
 	    double crossoverProbability = 0.9 ;
 	    double crossoverDistributionIndex = 20.0 ;
+	    
+	    /**
+	     * 水平数，阈值设置
+	     */
 	    OrthogonalTable.setQ(2); //水平数
-	    OrthogonalTable.setThreshold(0.01); //初始阈值
+	    OrthogonalTable.setThreshold(0.01); //初始阈值s
 	    crossover = new SMOCrossover(crossoverProbability, crossoverDistributionIndex,problem);
 	    double mutationProbability = 1.0 / problem.getNumberOfVariables();
 	    double mutationDistributionIndex = 20.0 ;
@@ -69,7 +77,7 @@ public class My_DE_Runner extends AbstractAlgorithmRunner{/**
 	        .setSelectionOperator(selection)
 	        
 	        //迭代代数 = 最大评估次数/种群大小
-	        .setMaxEvaluations(30000) //最大评估代数
+	        .setMaxEvaluations(25001) //最大评估代数
 	        .setPopulationSize(100) //种群个体数量
 	        .build() ;
 

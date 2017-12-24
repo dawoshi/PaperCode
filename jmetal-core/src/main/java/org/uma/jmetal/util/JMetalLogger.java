@@ -2,9 +2,24 @@ package org.uma.jmetal.util;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.uma.jmetal.qualityindicator.impl.Epsilon;
+import org.uma.jmetal.qualityindicator.impl.ErrorRatio;
+import org.uma.jmetal.qualityindicator.impl.GenerationalDistance;
+import org.uma.jmetal.qualityindicator.impl.InvertedGenerationalDistance;
+import org.uma.jmetal.qualityindicator.impl.InvertedGenerationalDistancePlus;
+import org.uma.jmetal.qualityindicator.impl.Spread;
+import org.uma.jmetal.qualityindicator.impl.hypervolume.PISAHypervolume;
+import org.uma.jmetal.solution.DoubleSolution;
+import org.uma.jmetal.solution.Solution;
+import org.uma.jmetal.util.front.Front;
+import org.uma.jmetal.util.front.imp.ArrayFront;
+import org.uma.jmetal.util.front.util.FrontNormalizer;
+import org.uma.jmetal.util.front.util.FrontUtils;
+import org.uma.jmetal.util.point.util.PointSolution;
 
 import java.io.*;
 import java.nio.charset.Charset;
+import java.util.List;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
@@ -88,4 +103,77 @@ public class JMetalLogger implements Serializable {
 				.toByteArray(), Charset.forName("UTF-8"))));
 		logger.info("Loggers configured with " + propertyFile);
 	}
+	
+	  public static void printLog(List<DoubleSolution> pop, String paretoFrontFile,String indicationPath) throws Exception{
+		    Front referenceFront = new ArrayFront(paretoFrontFile);
+		    FrontNormalizer frontNormalizer = new FrontNormalizer(referenceFront) ;
+		    Front normalizedReferenceFront = frontNormalizer.normalize(referenceFront) ;
+		    Front normalizedFront = frontNormalizer.normalize(new ArrayFront(pop)) ;
+		    List<PointSolution> normalizedPopulation = FrontUtils
+		        .convertFrontToSolutionList(normalizedFront) ;
+		    String outputString = "\n" ;
+		    double hypervolumen = new PISAHypervolume<PointSolution>(normalizedReferenceFront).evaluate(normalizedPopulation);
+		    outputString += "Hypervolume (N) : " +hypervolumen + "\n";
+		    
+		    double hypervolume = new PISAHypervolume<DoubleSolution>(referenceFront).evaluate(pop);
+		    outputString += "Hypervolume     : " + hypervolume + "\n";
+		    
+		    double epsilonn = new Epsilon<PointSolution>(normalizedReferenceFront).evaluate(normalizedPopulation);
+		    outputString += "Epsilon (N)     : " + epsilonn + "\n" ;
+		    
+		    double epsilon = new Epsilon<DoubleSolution>(referenceFront).evaluate(pop);
+		    outputString += "Epsilon         : " + epsilon  + "\n" ;
+		    
+		    double gdn= new GenerationalDistance<PointSolution>(normalizedReferenceFront).evaluate(normalizedPopulation);
+		    outputString += "GD (N)          : " + gdn + "\n";
+		    
+		    double gd =  new GenerationalDistance<DoubleSolution>(referenceFront).evaluate(pop);
+		    outputString += "GD              : " + gd  + "\n";
+		    
+		    double igdn = new InvertedGenerationalDistance<PointSolution>(normalizedReferenceFront).evaluate(normalizedPopulation);
+		    outputString += "IGD (N)         : " + igdn  + "\n";
+		    
+		    double igd = new InvertedGenerationalDistance<DoubleSolution>(referenceFront).evaluate(pop);
+		    outputString +="IGD             : " + igd + "\n";
+		    
+		    double igdnplus = new InvertedGenerationalDistancePlus<PointSolution>(normalizedReferenceFront).evaluate(normalizedPopulation);
+		    outputString += "IGD+ (N)        : " + igdnplus  + "\n";
+		    
+		    double igdplus = new InvertedGenerationalDistancePlus<DoubleSolution>(referenceFront).evaluate(pop);
+		    outputString += "IGD+            : " + igdplus  + "\n";
+		    
+		    double spread  =   new Spread<PointSolution>(normalizedReferenceFront).evaluate(normalizedPopulation);
+		    outputString += "Spread (N)      : " + spread  + "\n";
+		    
+		    double spreadre = new Spread<DoubleSolution>(referenceFront).evaluate(pop);
+		    outputString += "Spread          : " + spreadre  + "\n";
+//		    outputString += "R2 (N)          : " +
+//		        new R2<List<DoubleSolution>>(normalizedReferenceFront).runAlgorithm(normalizedPopulation) + "\n";
+//		    outputString += "R2              : " +
+//		        new R2<List<? extends Solution<?>>>(referenceFront).runAlgorithm(population) + "\n";
+		    outputString += "Error ratio     : " +
+		        new ErrorRatio<List<? extends Solution<?>>>(referenceFront).evaluate(pop) + "\n";
+		    
+		    /**
+		     * 输出到日志
+		     */
+		    JMetalLogger.logger.info(outputString);
+		    
+		    
+		    /**
+		     * 输出到文件
+		     */
+//		    DefaultFileOutputContext fileout = new DefaultFileOutputContext(indicatePath);
+//		    BufferedWriter bw = fileout.getFileWriter();
+		    try {                                                                        
+	          // 打开一个写文件器，构造函数中的第二个参数true表示以追加形式写文件      
+	           FileWriter wt = new FileWriter(indicationPath, true);                      
+	           wt.write(hypervolumen+","+hypervolume+","+epsilonn+","+epsilon+","+gdn+","+gd+","+igdn+","+igd+","+igdnplus+","+igdplus+","+spread+","+spreadre+"\n");  
+	           wt.flush();
+	           wt.close();                                                  
+	       } catch (IOException e) {                                                   
+	           e.printStackTrace();                                                    
+	       }
+	}
+	
 }

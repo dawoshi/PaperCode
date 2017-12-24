@@ -4,13 +4,13 @@ import java.util.ArrayList;
 
 public class OrthogonalTable{
 	private static int Q; //水平数
-	private static int F; //维度数
+	private volatile static int F; //维度数
 	private static int basecolumns; //基本列
 	private static int columns;  //最终列数
 	private static int rows; //行数
 	private static double threshold;
 	
-	public static int [][] getOrthogoanlTable(){
+	public synchronized static int [][] getOrthogoanlTable(){
 		
 		int [][] res = new int[getRows()+1][getRows()+1];
 		
@@ -24,6 +24,7 @@ public class OrthogonalTable{
 			int j =(int) Math.pow(getQ(), (k-1))/(getQ()-1)+1;
 			for(int i = 1;i <= getRows();i++){ //基本行
 				res[i][j] = (int)Math.abs((i-1)/(Math.pow(getQ(), getBasecolumns()-k)))%getQ();
+				System.out.println("i:"+i+","+"j:"+j+"getRows+1:"+getRows()+1);
 				
 			}
 		}
@@ -50,19 +51,19 @@ public class OrthogonalTable{
 		}
 		return tmp;	
 	}
-	public static void main(String args[]){
-		
-		OrthogonalTable.setF(2);
-		OrthogonalTable.setQ(3);
-		System.out.println("rows"+OrthogonalTable.getRows());
-		int [][] a= OrthogonalTable.getOrthogoanlTable();
-		for(int i =0;i<a.length;i++){
-			for(int j = 0;j<a[0].length;j++){
-				System.out.print(a[i][j]+",");
-			}
-			System.out.println();
-		}
-	}
+//	public static void main(String args[]){
+//		
+//		OrthogonalTable.setF(2);
+//		OrthogonalTable.setQ(3);
+//		System.out.println("rows"+OrthogonalTable.getRows());
+//		int [][] a= OrthogonalTable.getOrthogoanlTable();
+//		for(int i =0;i<a.length;i++){
+//			for(int j = 0;j<a[0].length;j++){
+//				System.out.print(a[i][j]+",");
+//			}
+//			System.out.println();
+//		}
+//	}
 
 	public static int getQ() {
 		return Q;
@@ -76,7 +77,7 @@ public class OrthogonalTable{
 		}
 	}
 
-	public static int getF() {
+	public static int  getF() {
 		return F;
 	}
 
