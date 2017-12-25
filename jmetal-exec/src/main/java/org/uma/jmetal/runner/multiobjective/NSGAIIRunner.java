@@ -10,6 +10,7 @@ import org.uma.jmetal.operator.impl.crossover.SMOCrossover;
 import org.uma.jmetal.operator.impl.mutation.PolynomialMutation;
 import org.uma.jmetal.operator.impl.selection.BinaryTournamentSelection;
 import org.uma.jmetal.problem.Problem;
+import org.uma.jmetal.problem.multiobjective.dtlz.DTLZ1;
 import org.uma.jmetal.problem.multiobjective.dtlz.DTLZ2;
 import org.uma.jmetal.problem.multiobjective.zdt.ZDT1;
 import org.uma.jmetal.problem.multiobjective.zdt.ZDT2;
@@ -55,12 +56,12 @@ public class NSGAIIRunner extends AbstractAlgorithmRunner {
       problemName = args[0] ;
       referenceParetoFront = args[1] ;
     } else {
-      problemName = "org.uma.jmetal.problem.multiobjective.zdt.ZDT6";
-      referenceParetoFront ="D:/codes/guoxinian/jMetal/jmetal-problem/src/test/resources/pareto_fronts/ZDT6.pf";
+      problemName = "org.uma.jmetal.problem.multiobjective.dtlz.DTLZ3";
+      referenceParetoFront ="D:/codes/guoxinian/jMetal/jmetal-problem/src/test/resources/pareto_fronts/DTLZ3.3D.pf";
     }
 
-    problem = new ZDT6(); //ProblemUtils.<DoubleSolution> loadProblem(problemName);
-
+    problem = ProblemUtils.<DoubleSolution> loadProblem(problemName);
+    
     double crossoverProbability = 0.9 ;
     double crossoverDistributionIndex = 20.0 ;
     crossover = new SBXCrossover(crossoverProbability, crossoverDistributionIndex) ;    

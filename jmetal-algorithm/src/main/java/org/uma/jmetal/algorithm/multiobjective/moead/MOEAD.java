@@ -23,7 +23,7 @@ import org.uma.jmetal.util.JMetalLogger;
 @SuppressWarnings("serial")
 public class MOEAD extends AbstractMOEAD<DoubleSolution> {
   protected DifferentialEvolutionCrossover differentialEvolutionCrossover ;
-  protected String referenceParetoFront ="D:/codes/guoxinian/jMetal/jmetal-problem/src/test/resources/pareto_fronts/ZDT6.pf";
+  protected String referenceParetoFront ="D:/codes/guoxinian/jMetal/jmetal-problem/src/test/resources/pareto_fronts/DTLZ3.3D.pf";
 
   protected String indicationPath ="MOEAD.csv";
 

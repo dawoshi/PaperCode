@@ -67,7 +67,7 @@ public class My_DE_Runner extends AbstractAlgorithmRunner{
 	      referenceParetoFront ="D:/codes/guoxinian/PaperCode/jmetal-problem/src/test/resources/pareto_fronts/DTLZ1.3D.pf";
 	    }
 
-	    problem = new DTLZ1(); //ProblemUtils.<DoubleSolution> loadProblem(problemName);
+	    problem = ProblemUtils.<DoubleSolution> loadProblem(problemName);
 
 	    double crossoverProbability = 0.9 ;
 	    double crossoverDistributionIndex = 20.0 ;
@@ -75,8 +75,8 @@ public class My_DE_Runner extends AbstractAlgorithmRunner{
 	    /**
 	     * 水平数，阈值设置
 	     */
-	    OrthogonalTable.setQ(2); //水平数
-	    OrthogonalTable.setThreshold(0.01); //初始阈值s
+	    OrthogonalTable.setQ(5); //水平数
+	    OrthogonalTable.setThreshold(0.2); //初始阈值s
 	    crossover = new SMOCrossover(crossoverProbability, crossoverDistributionIndex,problem);
 	    double mutationProbability = 1.0 / problem.getNumberOfVariables();
 	    double mutationDistributionIndex = 20.0 ;

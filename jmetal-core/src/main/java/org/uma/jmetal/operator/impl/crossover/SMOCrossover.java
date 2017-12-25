@@ -312,6 +312,10 @@ public class SMOCrossover implements CrossoverOperator<DoubleSolution>{
 	    			   }
 	    			   tmp.add(valmap[avgrow]); 
 	    		   }
+	    		  
+	    	   }
+	    	   if(res.size() == 0){
+	    		   res.add(valmap[0]);
 	    	   }
 	    	   for(int i = 0;i<res.size();i++){
 	    		   System.out.print(res.get(i));
