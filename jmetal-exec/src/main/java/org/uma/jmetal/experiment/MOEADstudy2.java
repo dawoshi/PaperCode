@@ -1,5 +1,5 @@
 package org.uma.jmetal.experiment;
-	import org.uma.jmetal.algorithm.Algorithm;
+import org.uma.jmetal.algorithm.Algorithm;
 import org.uma.jmetal.algorithm.multiobjective.moead.AbstractMOEAD;
 import org.uma.jmetal.algorithm.multiobjective.moead.MOEADBuilder;
 import org.uma.jmetal.algorithm.multiobjective.nsgaii.NSGAIIBuilder;
@@ -67,113 +67,123 @@ import java.util.List;
 	 * @author Antonio J. Nebro <antonio@lcc.uma.es>
 	 */
 	public class MOEADstudy2 {
+		 private static final int INDEPENDENT_RUNS = 30;
 
-	  private static final int INDEPENDENT_RUNS = 1 ;
+		  public static void main(String[] args) throws IOException {
+//		    if (args.length != 1) {
+//		      throw new JMetalException("Missing argument: experimentBaseDirectory");
+//		    }
+		    String experimentBaseDirectory = "C:/Users/William/Desktop/data/test/";
 
-	  public static void main(String[] args) throws IOException {
-//	    if (args.length != 1) {
-//	      throw new JMetalException("Needed arguments: experimentBaseDirectory") ;
-//	    }
-	    //String experimentBaseDirectory = "D:/codes/guoxinian/" ;
-	    String experimentBaseDirectory="C:/Users/William/Desktop/data/MOEAD/";
-	    List<ExperimentProblem<DoubleSolution>> problemList = new ArrayList<>();
-	    problemList.add(new ExperimentProblem<>(new ZDT1()));
-	    problemList.add(new ExperimentProblem<>(new ZDT2()));
-	    problemList.add(new ExperimentProblem<>(new ZDT3()));
-	    problemList.add(new ExperimentProblem<>(new ZDT4()));
-	    problemList.add(new ExperimentProblem<>(new ZDT6()));
+		    List<ExperimentProblem<DoubleSolution>> problemList = new ArrayList<>();
+		    problemList.add(new ExperimentProblem<>(new ZDT1()));
+		    problemList.add(new ExperimentProblem<>(new ZDT2()));
+		    problemList.add(new ExperimentProblem<>(new ZDT3()));
+		    problemList.add(new ExperimentProblem<>(new ZDT4()));
+		    problemList.add(new ExperimentProblem<>(new ZDT6()));
 
-	    List<ExperimentAlgorithm<DoubleSolution, List<DoubleSolution>>> algorithmList =
-	            configureAlgorithmList(problemList);
+		    List<ExperimentAlgorithm<DoubleSolution, List<DoubleSolution>>> algorithmList =
+		            configureAlgorithmList(problemList);
 
-	    ExperimentBuilder<DoubleSolution, List<DoubleSolution>> zdtStudy = new ExperimentBuilder<DoubleSolution, List<DoubleSolution>>("MOEADstudy2");
-	    zdtStudy.setAlgorithmList(algorithmList);
-	    zdtStudy.setProblemList(problemList);
-	    zdtStudy.setExperimentBaseDirectory(experimentBaseDirectory);
-	    zdtStudy.setOutputParetoFrontFileName("FUN");
-	    zdtStudy.setOutputParetoSetFileName("VAR");
-	    zdtStudy.setReferenceFrontDirectory(experimentBaseDirectory + "/ZDTStudy2/referenceFronts");
-	    zdtStudy.setIndicatorList(Arrays.asList(
-	            new Epsilon<DoubleSolution>(), new Spread<DoubleSolution>(), new GenerationalDistance<DoubleSolution>(),
-	            new PISAHypervolume<DoubleSolution>(),
-	            new InvertedGenerationalDistance<DoubleSolution>(), new InvertedGenerationalDistancePlus<DoubleSolution>()));
-	    zdtStudy.setIndependentRuns(INDEPENDENT_RUNS);
-	    zdtStudy.setNumberOfCores(8);
-	    Experiment<DoubleSolution, List<DoubleSolution>> experiment = zdtStudy.build();
+		    List<String> referenceFrontFileNames = Arrays.asList("ZDT1.pf", "ZDT2.pf", "ZDT3.pf", "ZDT4.pf", "ZDT6.pf");
 
-	    new ExecuteAlgorithms<>(experiment).run();
-	    new GenerateReferenceParetoSetAndFrontFromDoubleSolutions(experiment).run();
-	    new ComputeQualityIndicators<>(experiment).run() ;
-	    new GenerateLatexTablesWithStatistics(experiment).run() ;
-	    new GenerateWilcoxonTestTablesWithR<>(experiment).run() ;
-	    new GenerateFriedmanTestTables<>(experiment).run();
-	    new GenerateBoxplotsWithR<>(experiment).setRows(3).setColumns(3).setDisplayNotch().run() ;
-	  }
+		    Experiment<DoubleSolution, List<DoubleSolution>> experiment =
+		            new ExperimentBuilder<DoubleSolution, List<DoubleSolution>>("ZDTStudy")
+		                    .setAlgorithmList(algorithmList)
+		                    .setProblemList(problemList)
+		                    .setReferenceFrontDirectory("D:/codes/guoxinian/PaperCode/jmetal-problem/src/test/resources/pareto_fronts")
+		                    .setReferenceFrontFileNames(referenceFrontFileNames)
+		                    .setExperimentBaseDirectory(experimentBaseDirectory)
+		                    .setOutputParetoFrontFileName("FUN")
+		                    .setOutputParetoSetFileName("VAR")
+		                    .setIndicatorList(Arrays.asList(
+		                            new Epsilon<DoubleSolution>(),
+		                            new Spread<DoubleSolution>(),
+		                            new GenerationalDistance<DoubleSolution>(),
+		                            new PISAHypervolume<DoubleSolution>(),
+		                            new InvertedGenerationalDistance<DoubleSolution>(),
+		                            new InvertedGenerationalDistancePlus<DoubleSolution>()))
+		                    .setIndependentRuns(INDEPENDENT_RUNS)
+		                    .setNumberOfCores(8)
+		                    .build();
 
-	  /**
-	   * The algorithm list is composed of pairs {@link Algorithm} + {@link Problem} which form part of a
-	   * {@link TaggedAlgorithm}, which is a decorator for class {@link Algorithm}.
-	   *
-	   * @param problemList
-	   * @return
-	   */
-	  /**
-	   * The algorithm list is composed of pairs {@link Algorithm} + {@link Problem} which form part of a
-	   * {@link ExperimentAlgorithm}, which is a decorator for class {@link Algorithm}.
-	   *
-	   * @param problemList
-	   * @return
-	   */
-	  static List<ExperimentAlgorithm<DoubleSolution, List<DoubleSolution>>> configureAlgorithmList(
-	          List<ExperimentProblem<DoubleSolution>> problemList) {
-	    List<ExperimentAlgorithm<DoubleSolution, List<DoubleSolution>>> algorithms = new ArrayList<>();
-	    
-	    for (int i = 0; i < problemList.size(); i++) {
-	    	 Problem<DoubleSolution> problem = problemList.get(i).getProblem();
-	 	    CrossoverOperator<DoubleSolution> crossover;
-	    	OrthogonalTable.setQ(2); //水平数
-		    OrthogonalTable.setThreshold(0.01); //初始阈值s
-		    double crossoverProbability = 0.9 ;
-		    double crossoverDistributionIndex = 20.0 ;
+		    new ExecuteAlgorithms<>(experiment).run();
+		    new ComputeQualityIndicators<>(experiment).run();
+		    new GenerateLatexTablesWithStatistics(experiment).run();
+		    new GenerateWilcoxonTestTablesWithR<>(experiment).run();
+		    new GenerateFriedmanTestTables<>(experiment).run();
+		    new GenerateBoxplotsWithR<>(experiment).setRows(3).setColumns(3).setDisplayNotch().run();
+		  }
+
+		  /**
+		   * The algorithm list is composed of pairs {@link Algorithm} + {@link Problem} which form part of
+		   * a {@link ExperimentAlgorithm}, which is a decorator for class {@link Algorithm}.
+		   */
+		  static List<ExperimentAlgorithm<DoubleSolution, List<DoubleSolution>>> configureAlgorithmList(
+		          List<ExperimentProblem<DoubleSolution>> problemList) {
+		    List<ExperimentAlgorithm<DoubleSolution, List<DoubleSolution>>> algorithms = new ArrayList<>();
+
+//		    for (int i = 0; i < problemList.size(); i++) {
+//		      double mutationProbability = 1.0 / problemList.get(i).getProblem().getNumberOfVariables();
+//		      double mutationDistributionIndex = 20.0;
+//		      Algorithm<List<DoubleSolution>> algorithm = new SMPSOBuilder((DoubleProblem) problemList.get(i).getProblem(),
+//		              new CrowdingDistanceArchive<DoubleSolution>(100))
+//		              .setMutation(new PolynomialMutation(mutationProbability, mutationDistributionIndex))
+//		              .setMaxIterations(250)
+//		              .setSwarmSize(100)
+//		              .setSolutionListEvaluator(new SequentialSolutionListEvaluator<DoubleSolution>())
+//		              .build();
+//		      algorithms.add(new ExperimentAlgorithm<>(algorithm, problemList.get(i).getTag()));
+//		    }
+
+		    for (int i = 0; i < problemList.size(); i++) {
+		      Algorithm<List<DoubleSolution>> algorithm = new NSGAIIBuilder<DoubleSolution>(
+		              problemList.get(i).getProblem(),
+		              new SMOCrossover(0.9, 20,problemList.get(i).getProblem()),
+		              //new SBXCrossover(1.0, 20.0),
+		              new PolynomialMutation(1.0 / problemList.get(i).getProblem().getNumberOfVariables(), 20.0)).build();
+		      algorithms.add(new ExperimentAlgorithm<>(algorithm, problemList.get(i).getTag()));
+		    }
+
+//		    for (int i = 0; i < problemList.size(); i++) {
+//		      Algorithm<List<DoubleSolution>> algorithm = new SPEA2Builder<DoubleSolution>(
+//		              problemList.get(i).getProblem(),
+//		              new SBXCrossover(1.0, 10.0),
+//		              new PolynomialMutation(1.0 / problemList.get(i).getProblem().getNumberOfVariables(), 20.0))
+//		              .build();
+//		      algorithms.add(new ExperimentAlgorithm<>(algorithm, problemList.get(i).getTag()));
+//		    }
 		    
-		    crossover = new SMOCrossover(crossoverProbability, crossoverDistributionIndex,problem);
-	      Algorithm<List<DoubleSolution>> algorithm = new NSGAIIBuilder<DoubleSolution>(
-	              problem,
-	              crossover,
-	              new PolynomialMutation(1.0 / problemList.get(i).getProblem().getNumberOfVariables(), 20.0))
-	              .build();
-	      algorithms.add(new ExperimentAlgorithm<>(algorithm, problemList.get(i).getTag()));
-	    }
-
-//	    for (int i = 0; i < problemList.size(); i++) {
-//	      double cr = 1.0 ;
-//	      double f = 0.5 ;
-//	      Problem<DoubleSolution> problem = problemList.get(i).getProblem();
-//	      MutationOperator<DoubleSolution> mutation;
-//	      DifferentialEvolutionCrossover crossover;
-//	      
-//	      crossover = new DifferentialEvolutionCrossover(cr, f, "rand/1/bin");
+//		    for (int i = 0; i < problemList.size(); i++) {
+//			      double cr = 1.0 ;
+//			      double f = 0.5 ;
+//			      Problem<DoubleSolution> problem = problemList.get(i).getProblem();
+//			      MutationOperator<DoubleSolution> mutation;
+//			      DifferentialEvolutionCrossover crossover;
+//			      
+//			      crossover = new DifferentialEvolutionCrossover(cr, f, "rand/1/bin");
 //
-//	      double mutationProbability = 1.0 / problem.getNumberOfVariables();
-//	      double mutationDistributionIndex = 20.0;
-//	      mutation = new PolynomialMutation(mutationProbability, mutationDistributionIndex);
+//			      double mutationProbability = 1.0 / problem.getNumberOfVariables();
+//			      double mutationDistributionIndex = 20.0;
+//			      mutation = new PolynomialMutation(mutationProbability, mutationDistributionIndex);
 //
-//	      Algorithm<List<DoubleSolution>> algorithm = new MOEADBuilder(problem, MOEADBuilder.Variant.MOEAD)
-//	              .setCrossover(crossover)
-//	              .setMutation(mutation)
-//	              .setMaxEvaluations(25000)
-//	              .setPopulationSize(100)
-//	              .setResultPopulationSize(100)
-//	              .setNeighborhoodSelectionProbability(0.9)
-//	              .setMaximumNumberOfReplacedSolutions(2)
-//	              .setNeighborSize(20)
-//	              .setFunctionType(AbstractMOEAD.FunctionType.TCHE)
-//	              .setDataDirectory("MOEAD_Weights")
-//	              .build();
-//	      algorithms.add(new ExperimentAlgorithm<>(algorithm, problemList.get(i).getTag()));
-//	    }
+//			      Algorithm<List<DoubleSolution>> algorithm = new MOEADBuilder(problem, MOEADBuilder.Variant.MOEAD)
+//			              .setCrossover(crossover)
+//			              .setMutation(mutation)
+//			              .setMaxEvaluations(25000)
+//			              .setPopulationSize(100)
+//			              .setResultPopulationSize(100)
+//			              .setNeighborhoodSelectionProbability(0.9)
+//			              .setMaximumNumberOfReplacedSolutions(2)
+//			              .setNeighborSize(20)
+//			              .setFunctionType(AbstractMOEAD.FunctionType.TCHE)
+//			              .setDataDirectory("MOEAD_Weights")
+//			              .build();
+//			      algorithms.add(new ExperimentAlgorithm<>(algorithm, problemList.get(i).getTag()));
+//			    }
 
-	    return algorithms ;
-	  }
-	}
+		    return algorithms;
+		  }
+		}
+	
 

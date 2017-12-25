@@ -29,7 +29,19 @@ import org.uma.jmetal.util.comparator.RankingAndCrowdingDistanceComparator;
 import java.io.FileNotFoundException;
 import java.util.List;
 
-public class My_DE_Runner extends AbstractAlgorithmRunner{/**
+
+/**
+ * 需要修改的地方：
+ *            1、problemName
+ *            2、referenceParetoFront
+ *            3、 problem 
+ * @author William
+ *
+ */
+
+
+public class My_DE_Runner extends AbstractAlgorithmRunner{
+	/**
 	   * @param args Command line arguments.
 	   * @throws JMetalException
 	   * @throws FileNotFoundException
@@ -52,7 +64,7 @@ public class My_DE_Runner extends AbstractAlgorithmRunner{/**
 	      referenceParetoFront = args[1] ;
 	    } else {
 	      problemName = "org.uma.jmetal.problem.multiobjective.dtlz.DTLZ1";
-	      referenceParetoFront ="D:/codes/guoxinian/jMetal/jmetal-problem/src/test/resources/pareto_fronts/DTLZ1.3D.pf";
+	      referenceParetoFront ="D:/codes/guoxinian/PaperCode/jmetal-problem/src/test/resources/pareto_fronts/DTLZ1.3D.pf";
 	    }
 
 	    problem = new DTLZ1(); //ProblemUtils.<DoubleSolution> loadProblem(problemName);

@@ -42,8 +42,8 @@ public class NSGAII<S extends Solution<?>> extends AbstractGeneticAlgorithm<S, L
   protected final SolutionListEvaluator<S> evaluator;
 
   protected int evaluations;
-  protected String referenceParetoFront ="D:/codes/guoxinian/jMetal/jmetal-problem/src/test/resources/pareto_fronts/DTLZ1.3D.pf";
-
+  protected String referenceParetoFront ="D:/codes/guoxinian/PaperCode/jmetal-problem/src/test/resources/pareto_fronts/DTLZ1.3D.pf";
+  //D:/codes/guoxinian/PaperCode/jmetal-problem/src/test/resources/pareto_fronts
   protected String indicatePath ="NSGAII.csv";
 
 
