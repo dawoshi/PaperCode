@@ -56,8 +56,8 @@ public class NSGAIIRunner extends AbstractAlgorithmRunner {
       problemName = args[0] ;
       referenceParetoFront = args[1] ;
     } else {
-      problemName = "org.uma.jmetal.problem.multiobjective.dtlz.DTLZ3";
-      referenceParetoFront ="D:/codes/guoxinian/jMetal/jmetal-problem/src/test/resources/pareto_fronts/DTLZ3.3D.pf";
+      problemName = "org.uma.jmetal.problem.multiobjective.dtlz.DTLZ2";
+      referenceParetoFront ="D:/codes/guoxinian/jMetal/jmetal-problem/src/test/resources/pareto_fronts/DTLZ2.3D.pf";
     }
 
     problem = ProblemUtils.<DoubleSolution> loadProblem(problemName);

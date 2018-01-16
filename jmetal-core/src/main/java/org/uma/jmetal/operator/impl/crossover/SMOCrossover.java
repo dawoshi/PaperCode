@@ -317,10 +317,6 @@ public class SMOCrossover implements CrossoverOperator<DoubleSolution>{
 	    	   if(res.size() == 0){
 	    		   res.add(valmap[0]);
 	    	   }
-	    	   for(int i = 0;i<res.size();i++){
-	    		   System.out.print(res.get(i));
-	    	   }
-	    	   System.out.println();
 	    	   ress.add(res);
 	    	   tmp=null;
 	    	   res=null;
@@ -379,7 +375,6 @@ public class SMOCrossover implements CrossoverOperator<DoubleSolution>{
 	    	    	List<DoubleSolution> tmpp= new ArrayList<DoubleSolution>();
 	    	    	RankingAndCrowdingSelection<DoubleSolution> rankingAndCrowding = new RankingAndCrowdingSelection<DoubleSolution>(4) ;
 	    	    	for(int i =0;i<offspring.size();i++){
-	    	    		System.out.println("i:"+i);
 	    	    		tmp.add(offspring.get(i));
 	    	    		if((i%100 == 0) &&(i!=0)){
 	    	    			tmpp = rankingAndCrowding.execute(tmp);
@@ -499,7 +494,6 @@ public class SMOCrossover implements CrossoverOperator<DoubleSolution>{
 	 private static List<List<Double>> recursive (List<List<Double>> dimValue) {  
 	        long total = 1;  
 	        for (List<Double> list : dimValue) { 
-	        	System.out.println("list.size():"+list.size());
 	            total *= list.size();  
 	        }  
 	        List<List<Double>> myResult = new LinkedList<List<Double>>();
@@ -507,12 +501,9 @@ public class SMOCrossover implements CrossoverOperator<DoubleSolution>{
 	        long loopPerItem = 1;  
 	        long now = 1;  
 	        for (List<Double> list : dimValue) {  
-	            now *= list.size();  
-	  
+	            now *= list.size();
 	            int index = 0;  
-	            long currentSize = list.size();  
-	            
-	            System.out.println("total:"+total+","+"now:"+now);
+	            long currentSize = list.size();
 	            itemLoopNum = total / now;  
 	            loopPerItem = total / (itemLoopNum * currentSize);  
 	            int myIndex = 0;  
