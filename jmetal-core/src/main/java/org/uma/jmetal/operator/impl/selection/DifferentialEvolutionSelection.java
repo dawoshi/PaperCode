@@ -42,7 +42,9 @@ public class DifferentialEvolutionSelection implements SelectionOperator<List<Do
   public List<DoubleSolution> execute(List<DoubleSolution> solutionSet) {
     if (null == solutionSet) {
       throw new JMetalException("Parameter is null") ;
-    } else if ((solutionListIndex < 0) || (solutionListIndex > solutionSet.size())) {
+    } else if ((solutionListIndex > 0) || (solutionListIndex > solutionSet.size())) {
+    	System.out.println("solutionlistindex:"+solutionListIndex+"-----------------");
+    	System.out.println("solutionset.size():"+solutionSet.size()+"-----------------");
       throw new JMetalException(
               "Index value invalid: " + solutionListIndex );
     } else if (solutionSet.size() < 4) {

@@ -107,7 +107,7 @@ public class NSGAIIBuilder<S extends Solution<?>> implements AlgorithmBuilder<NS
       algorithm = new NSGAIIMeasures<S>(problem, maxEvaluations, populationSize, crossoverOperator,
           mutationOperator, selectionOperator, evaluator);
     }
-
+    //algorithm.setReferenceParetoFront(path);
     return algorithm ;
   }
 

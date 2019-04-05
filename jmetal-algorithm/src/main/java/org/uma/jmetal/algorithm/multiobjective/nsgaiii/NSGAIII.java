@@ -13,6 +13,7 @@ import org.uma.jmetal.qualityindicator.impl.Spread;
 import org.uma.jmetal.qualityindicator.impl.hypervolume.PISAHypervolume;
 import org.uma.jmetal.solution.DoubleSolution;
 import org.uma.jmetal.solution.Solution;
+import org.uma.jmetal.util.Configure;
 import org.uma.jmetal.util.JMetalLogger;
 import org.uma.jmetal.util.SolutionListUtils;
 import org.uma.jmetal.util.evaluator.SolutionListEvaluator;
@@ -168,10 +169,9 @@ public class NSGAIII<S extends Solution<?>> extends AbstractGeneticAlgorithm<S, 
                     getProblem().getNumberOfObjectives());
     
     pop = selection.execute(pop);
-    
     List<S> p = getResult();
     try {
-    	JMetalLogger.printLog((List<DoubleSolution>)p, referenceParetoFront, indicationPath);
+    	JMetalLogger.printLog((List<DoubleSolution>)p, referenceParetoFront, indicationPath,Configure.getproblem());
     	
 	} catch (Exception e) {
 		// TODO Auto-generated catch block

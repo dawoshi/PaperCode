@@ -6,8 +6,8 @@ package org.uma.jmetal.problem;
  * @author Antonio J. Nebro <antonio@lcc.uma.es>
  */
 public interface IntegerDoubleProblem<S> extends Problem<S> {
-  public Number getLowerBound(int index) ;
-  public Number getUpperBound(int index) ;
+  public int getLowerBound(int index) ;
+  public int getUpperBound(int index) ;
   public int getNumberOfIntegerVariables() ;
   public int getNumberOfDoubleVariables() ;
 }

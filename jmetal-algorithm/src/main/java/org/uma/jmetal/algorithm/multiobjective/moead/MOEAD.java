@@ -9,6 +9,7 @@ import org.uma.jmetal.operator.MutationOperator;
 import org.uma.jmetal.operator.impl.crossover.DifferentialEvolutionCrossover;
 import org.uma.jmetal.problem.Problem;
 import org.uma.jmetal.solution.DoubleSolution;
+import org.uma.jmetal.util.Configure;
 import org.uma.jmetal.util.JMetalLogger;
 
 /**
@@ -23,10 +24,10 @@ import org.uma.jmetal.util.JMetalLogger;
 @SuppressWarnings("serial")
 public class MOEAD extends AbstractMOEAD<DoubleSolution> {
   protected DifferentialEvolutionCrossover differentialEvolutionCrossover ;
-  protected String referenceParetoFront ="D:/codes/guoxinian/jMetal/jmetal-problem/src/test/resources/pareto_fronts/DTLZ2.3D.pf";
-
+  //public String referenceParetoFront ="D:/codes/guoxinian/jMetal/jmetal-problem/src/test/resources/pareto_fronts/DTLZ2.3D.pf";
+  public String referenceParetoFront = Configure.getReferenceParetoFrontPath();
   protected String indicationPath ="MOEAD.csv";
-
+  
   public MOEAD(Problem<DoubleSolution> problem,
       int populationSize,
       int resultPopulationSize,
@@ -76,7 +77,7 @@ public class MOEAD extends AbstractMOEAD<DoubleSolution> {
       }
       List<DoubleSolution> p = getResult();
       try {
-      	JMetalLogger.printLog((List<DoubleSolution>)p, referenceParetoFront, indicationPath);
+      	//JMetalLogger.printLog((List<DoubleSolution>)p, referenceParetoFront, indicationPath,Configure.getproblem());
       	
   	} catch (Exception e) {
   		// TODO Auto-generated catch block

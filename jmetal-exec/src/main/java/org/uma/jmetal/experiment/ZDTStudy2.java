@@ -9,9 +9,23 @@ import org.uma.jmetal.algorithm.multiobjective.spea2.SPEA2Builder;
 import org.uma.jmetal.operator.MutationOperator;
 import org.uma.jmetal.operator.impl.crossover.DifferentialEvolutionCrossover;
 import org.uma.jmetal.operator.impl.crossover.SBXCrossover;
+import org.uma.jmetal.operator.impl.crossover.SMOCrossover;
 import org.uma.jmetal.operator.impl.mutation.PolynomialMutation;
 import org.uma.jmetal.problem.DoubleProblem;
 import org.uma.jmetal.problem.Problem;
+import org.uma.jmetal.problem.multiobjective.Fonseca;
+import org.uma.jmetal.problem.multiobjective.Kursawe;
+import org.uma.jmetal.problem.multiobjective.Schaffer;
+import org.uma.jmetal.problem.multiobjective.UF.UF1;
+import org.uma.jmetal.problem.multiobjective.UF.UF10;
+import org.uma.jmetal.problem.multiobjective.UF.UF2;
+import org.uma.jmetal.problem.multiobjective.UF.UF3;
+import org.uma.jmetal.problem.multiobjective.UF.UF4;
+import org.uma.jmetal.problem.multiobjective.UF.UF5;
+import org.uma.jmetal.problem.multiobjective.UF.UF6;
+import org.uma.jmetal.problem.multiobjective.UF.UF7;
+import org.uma.jmetal.problem.multiobjective.UF.UF8;
+import org.uma.jmetal.problem.multiobjective.UF.UF9;
 import org.uma.jmetal.problem.multiobjective.dtlz.DTLZ1;
 import org.uma.jmetal.problem.multiobjective.dtlz.DTLZ2;
 import org.uma.jmetal.problem.multiobjective.dtlz.DTLZ3;
@@ -32,6 +46,8 @@ import org.uma.jmetal.qualityindicator.impl.Spread;
 import org.uma.jmetal.qualityindicator.impl.hypervolume.PISAHypervolume;
 import org.uma.jmetal.solution.DoubleSolution;
 import org.uma.jmetal.util.JMetalException;
+import org.uma.jmetal.util.OrthogonalTable;
+import org.uma.jmetal.util.ProblemUtils;
 import org.uma.jmetal.util.archive.impl.CrowdingDistanceArchive;
 import org.uma.jmetal.util.evaluator.impl.SequentialSolutionListEvaluator;
 import org.uma.jmetal.util.experiment.Experiment;
@@ -88,6 +104,7 @@ public class ZDTStudy2 {
     problemList.add(new ExperimentProblem<>(new ZDT3()));
     problemList.add(new ExperimentProblem<>(new ZDT4()));
     problemList.add(new ExperimentProblem<>(new ZDT6()));
+    
     problemList.add(new ExperimentProblem<>(new DTLZ1()));
     problemList.add(new ExperimentProblem<>(new DTLZ2()));
     problemList.add(new ExperimentProblem<>(new DTLZ3()));
@@ -95,6 +112,25 @@ public class ZDTStudy2 {
     problemList.add(new ExperimentProblem<>(new DTLZ5()));
     problemList.add(new ExperimentProblem<>(new DTLZ6()));
     problemList.add(new ExperimentProblem<>(new DTLZ7()));
+    
+    problemList.add(new ExperimentProblem<>(new UF1()));
+    problemList.add(new ExperimentProblem<>(new UF2()));
+    problemList.add(new ExperimentProblem<>(new UF3()));
+    problemList.add(new ExperimentProblem<>(new UF4()));
+    problemList.add(new ExperimentProblem<>(new UF5()));
+    problemList.add(new ExperimentProblem<>(new UF6()));
+    problemList.add(new ExperimentProblem<>(new UF7()));
+    problemList.add(new ExperimentProblem<>(new UF8()));
+    problemList.add(new ExperimentProblem<>(new UF9()));
+    problemList.add(new ExperimentProblem<>(new UF10()));
+    
+    problemList.add(new ExperimentProblem<>(new Schaffer()));
+    problemList.add(new ExperimentProblem<>(new Fonseca()));
+    problemList.add(new ExperimentProblem<>(new Kursawe()));
+    
+    
+
+    
 
     List<ExperimentAlgorithm<DoubleSolution, List<DoubleSolution>>> algorithmList =
             configureAlgorithmList(problemList);
@@ -142,19 +178,6 @@ public class ZDTStudy2 {
     List<ExperimentAlgorithm<DoubleSolution, List<DoubleSolution>>> algorithms = new ArrayList<>();
 
     for (int i = 0; i < problemList.size(); i++) {
-      double mutationProbability = 1.0 / problemList.get(i).getProblem().getNumberOfVariables();
-      double mutationDistributionIndex = 20.0;
-      Algorithm<List<DoubleSolution>> algorithm = new SMPSOBuilder((DoubleProblem) problemList.get(i).getProblem(),
-              new CrowdingDistanceArchive<DoubleSolution>(100))
-              .setMutation(new PolynomialMutation(mutationProbability, mutationDistributionIndex))
-              .setMaxIterations(250)
-              .setSwarmSize(100)
-              .setSolutionListEvaluator(new SequentialSolutionListEvaluator<DoubleSolution>())
-              .build();
-      algorithms.add(new ExperimentAlgorithm<>(algorithm, problemList.get(i).getTag()));
-    }
-
-    for (int i = 0; i < problemList.size(); i++) {
       Algorithm<List<DoubleSolution>> algorithm = new NSGAIIBuilder<DoubleSolution>(
               problemList.get(i).getProblem(),
               new SBXCrossover(1.0, 20.0),
@@ -162,7 +185,22 @@ public class ZDTStudy2 {
               .build();
       algorithms.add(new ExperimentAlgorithm<>(algorithm, problemList.get(i).getTag()));
     }
-
+    
+//    double crossoverProbability = 0.1 ;
+//	double crossoverDistributionIndex = 20.0 ;
+//	OrthogonalTable.setQ(2); //水平数
+//	OrthogonalTable.setThreshold(0.8); //初始阈值s 
+//	
+//  for (int i = 0; i < problemList.size(); i++) {
+//  Algorithm<List<DoubleSolution>> algorithm = new NSGAIIBuilder<DoubleSolution>(
+//          problemList.get(i).getProblem(),
+//  	    new SMOCrossover(crossoverProbability, crossoverDistributionIndex,problemList.get(i).getProblem()),
+//          //new SBXCrossover(1.0, 20.0),
+//          new PolynomialMutation(1.0 / problemList.get(i).getProblem().getNumberOfVariables(), 20.0))
+//          .build();
+//  algorithms.add(new ExperimentAlgorithm<>(algorithm, problemList.get(i).getTag()));
+//}
+    
     for (int i = 0; i < problemList.size(); i++) {
 	      double cr = 1.0 ;
 	      double f = 0.5 ;

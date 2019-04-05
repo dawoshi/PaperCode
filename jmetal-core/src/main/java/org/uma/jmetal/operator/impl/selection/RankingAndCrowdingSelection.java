@@ -22,7 +22,7 @@ import java.util.List;
 @SuppressWarnings("serial")
 public class RankingAndCrowdingSelection<S extends Solution<?>>
     implements SelectionOperator<List<S>,List<S>> {
-  private final int solutionsToSelect ;
+    private final int solutionsToSelect ;
 
   /** Constructor */
   public RankingAndCrowdingSelection(int solutionsToSelect) {

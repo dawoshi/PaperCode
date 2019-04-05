@@ -104,49 +104,58 @@ public class JMetalLogger implements Serializable {
 		logger.info("Loggers configured with " + propertyFile);
 	}
 	
-	  public static void printLog(List<DoubleSolution> pop, String paretoFrontFile,String indicationPath) throws Exception{
+	 /**
+	   * 
+	   * 获取每代的信息
+	   * 
+	   * @param pop 种群
+	   * @param paretoFrontFile  真实pareto解集
+	   * @throws Exception
+	   */
+	  public static void printLog(List<DoubleSolution> pop, String paretoFrontFile,String indicationPath,String number) throws Exception{
+		  System.out.println("pop.get(0).getNumberOfObjectives():"+pop.get(0).getNumberOfObjectives());
 		    Front referenceFront = new ArrayFront(paretoFrontFile);
-		    FrontNormalizer frontNormalizer = new FrontNormalizer(referenceFront) ;
-		    Front normalizedReferenceFront = frontNormalizer.normalize(referenceFront) ;
-		    Front normalizedFront = frontNormalizer.normalize(new ArrayFront(pop)) ;
-		    List<PointSolution> normalizedPopulation = FrontUtils
-		        .convertFrontToSolutionList(normalizedFront) ;
+		    //FrontNormalizer frontNormalizer = new FrontNormalizer(referenceFront) ;
+		    //Front normalizedReferenceFront = frontNormalizer.normalize(referenceFront) ;
+		    //Front normalizedFront = frontNormalizer.normalize(new ArrayFront(pop)) ;
+		    //List<PointSolution> normalizedPopulation = FrontUtils
+		     //  .convertFrontToSolutionList(normalizedFront) ;
 		    String outputString = "\n" ;
-		    double hypervolumen = new PISAHypervolume<PointSolution>(normalizedReferenceFront).evaluate(normalizedPopulation);
-		    outputString += "Hypervolume (N) : " +hypervolumen + "\n";
+//		    double hypervolumen = new PISAHypervolume<PointSolution>(normalizedReferenceFront).evaluate(normalizedPopulation);
+//		    outputString += "Hypervolume (N) : " +hypervolumen + "\n";
 		    
 		    double hypervolume = new PISAHypervolume<DoubleSolution>(referenceFront).evaluate(pop);
 		    outputString += "Hypervolume     : " + hypervolume + "\n";
 		    
-		    double epsilonn = new Epsilon<PointSolution>(normalizedReferenceFront).evaluate(normalizedPopulation);
-		    outputString += "Epsilon (N)     : " + epsilonn + "\n" ;
+//		    double epsilonn = new Epsilon<PointSolution>(normalizedReferenceFront).evaluate(normalizedPopulation);
+//		    outputString += "Epsilon (N)     : " + epsilonn + "\n" ;
 		    
-		    double epsilon = new Epsilon<DoubleSolution>(referenceFront).evaluate(pop);
-		    outputString += "Epsilon         : " + epsilon  + "\n" ;
+//		    double epsilon = new Epsilon<DoubleSolution>(referenceFront).evaluate(pop);
+//		    outputString += "Epsilon         : " + epsilon  + "\n" ;
 		    
-		    double gdn= new GenerationalDistance<PointSolution>(normalizedReferenceFront).evaluate(normalizedPopulation);
-		    outputString += "GD (N)          : " + gdn + "\n";
+//		    double gdn= new GenerationalDistance<PointSolution>(normalizedReferenceFront).evaluate(normalizedPopulation);
+//		    outputString += "GD (N)          : " + gdn + "\n";
 		    
 		    double gd =  new GenerationalDistance<DoubleSolution>(referenceFront).evaluate(pop);
 		    outputString += "GD              : " + gd  + "\n";
 		    
-		    double igdn = new InvertedGenerationalDistance<PointSolution>(normalizedReferenceFront).evaluate(normalizedPopulation);
-		    outputString += "IGD (N)         : " + igdn  + "\n";
+//		    double igdn = new InvertedGenerationalDistance<PointSolution>(normalizedReferenceFront).evaluate(normalizedPopulation);
+//		    outputString += "IGD (N)         : " + igdn  + "\n";
 		    
 		    double igd = new InvertedGenerationalDistance<DoubleSolution>(referenceFront).evaluate(pop);
 		    outputString +="IGD             : " + igd + "\n";
 		    
-		    double igdnplus = new InvertedGenerationalDistancePlus<PointSolution>(normalizedReferenceFront).evaluate(normalizedPopulation);
-		    outputString += "IGD+ (N)        : " + igdnplus  + "\n";
+//		    double igdnplus = new InvertedGenerationalDistancePlus<PointSolution>(normalizedReferenceFront).evaluate(normalizedPopulation);
+//		    outputString += "IGD+ (N)        : " + igdnplus  + "\n";
 		    
 		    double igdplus = new InvertedGenerationalDistancePlus<DoubleSolution>(referenceFront).evaluate(pop);
 		    outputString += "IGD+            : " + igdplus  + "\n";
 		    
-		    double spread  =   new Spread<PointSolution>(normalizedReferenceFront).evaluate(normalizedPopulation);
-		    outputString += "Spread (N)      : " + spread  + "\n";
+//		    double spread  =   new Spread<PointSolution>(normalizedReferenceFront).evaluate(normalizedPopulation);
+//		    outputString += "Spread (N)      : " + spread  + "\n";
 		    
-		    double spreadre = new Spread<DoubleSolution>(referenceFront).evaluate(pop);
-		    outputString += "Spread          : " + spreadre  + "\n";
+		    double spread = new Spread<DoubleSolution>(referenceFront).evaluate(pop);
+		    outputString += "Spread          : " + spread  + "\n";
 //		    outputString += "R2 (N)          : " +
 //		        new R2<List<DoubleSolution>>(normalizedReferenceFront).runAlgorithm(normalizedPopulation) + "\n";
 //		    outputString += "R2              : " +
@@ -163,17 +172,14 @@ public class JMetalLogger implements Serializable {
 		    /**
 		     * 输出到文件
 		     */
-//		    DefaultFileOutputContext fileout = new DefaultFileOutputContext(indicatePath);
-//		    BufferedWriter bw = fileout.getFileWriter();
 		    try {                                                                        
-	          // 打开一个写文件器，构造函数中的第二个参数true表示以追加形式写文件      
-	           FileWriter wt = new FileWriter(indicationPath, true);                      
-	           wt.write(hypervolumen+","+hypervolume+","+epsilonn+","+epsilon+","+gdn+","+gd+","+igdn+","+igd+","+igdnplus+","+igdplus+","+spread+","+spreadre+"\n");  
-	           wt.flush();
-	           wt.close();                                                  
-	       } catch (IOException e) {                                                   
-	           e.printStackTrace();                                                    
-	       }
-	}
-	
+	            // 打开一个写文件器，构造函数中的第二个参数true表示以追加形式写文件      
+	             FileWriter wt = new FileWriter(number+indicationPath, true);                      
+	             //wt.write(hypervolumen+","+hypervolume+","+epsilonn+","+epsilon+","+gdn+","+gd+","+igdn+","+igd+","+igdnplus+","+igdplus+","+spread+","+spreadre+"\n");
+	             wt.write(hypervolume+","+gd+","+igd+","+spread+"\n");
+	             wt.close();                                                  
+	         } catch (IOException e) {                                                   
+	             e.printStackTrace();                                                    
+	         }    
+	  }
 }

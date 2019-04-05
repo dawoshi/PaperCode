@@ -6,7 +6,10 @@ import org.uma.jmetal.operator.CrossoverOperator;
 import org.uma.jmetal.operator.MutationOperator;
 import org.uma.jmetal.operator.SelectionOperator;
 import org.uma.jmetal.problem.Problem;
+import org.uma.jmetal.solution.DoubleSolution;
 import org.uma.jmetal.solution.Solution;
+import org.uma.jmetal.util.Configure;
+import org.uma.jmetal.util.JMetalLogger;
 import org.uma.jmetal.util.evaluator.SolutionListEvaluator;
 import org.uma.jmetal.util.solutionattribute.impl.StrengthRawFitness;
 
@@ -24,6 +27,8 @@ public class SPEA2<S extends Solution<?>> extends AbstractGeneticAlgorithm<S, Li
   protected List<S> archive;
   protected final StrengthRawFitness<S> strenghtRawFitness = new StrengthRawFitness<S>();
   protected final EnvironmentalSelection<S> environmentalSelection;
+  public String referenceParetoFront=Configure.getReferenceParetoFrontPath();
+  private String indicationPath="SPEA2.csv";
 
   public SPEA2(Problem<S> problem, int maxIterations, int populationSize,
       CrossoverOperator<S> crossoverOperator, MutationOperator<S> mutationOperator,
@@ -89,6 +94,12 @@ public class SPEA2<S extends Solution<?>> extends AbstractGeneticAlgorithm<S, Li
       mutationOperator.execute(offspring.get(0));
       offSpringPopulation.add(offspring.get(0));
     }
+  	try {
+		JMetalLogger.printLog((List<DoubleSolution>)offSpringPopulation, referenceParetoFront, indicationPath,Configure.getproblem());
+	} catch (Exception e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
     return offSpringPopulation;
   }
 

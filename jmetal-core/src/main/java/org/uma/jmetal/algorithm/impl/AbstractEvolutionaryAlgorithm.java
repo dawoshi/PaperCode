@@ -2,6 +2,10 @@ package org.uma.jmetal.algorithm.impl;
 
 import org.uma.jmetal.algorithm.Algorithm;
 import org.uma.jmetal.problem.Problem;
+import org.uma.jmetal.solution.DoubleSolution;
+import org.uma.jmetal.util.Configure;
+import org.uma.jmetal.util.JMetalLogger;
+
 import java.util.List;
 
 /**
@@ -56,10 +60,20 @@ public abstract class AbstractEvolutionaryAlgorithm<S, R>  implements Algorithm<
     population = evaluatePopulation(population);
     initProgress();
     while (!isStoppingConditionReached()) {
+    	
+      System.out.println("population.size():"+population.size()+"-----------------------");
+      
+      
+      
       matingPopulation = selection(population);
       offspringPopulation = reproduction(matingPopulation);
       offspringPopulation = evaluatePopulation(offspringPopulation);
       population = replacement(population, offspringPopulation);
+      try {      	  
+        //JMetalLogger.printLog((List<DoubleSolution>)population, Configure.getReferenceParetoFrontPath(),Configure.getIndicationPath(),Configure.getproblem());
+  	} catch (Exception e) {
+  		e.printStackTrace();
+  	}
       updateProgress();
     }
   }

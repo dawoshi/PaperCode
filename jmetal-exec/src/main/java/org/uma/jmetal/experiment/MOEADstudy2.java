@@ -139,8 +139,8 @@ import java.util.List;
 		    for (int i = 0; i < problemList.size(); i++) {
 		      Algorithm<List<DoubleSolution>> algorithm = new NSGAIIBuilder<DoubleSolution>(
 		              problemList.get(i).getProblem(),
-		              new SMOCrossover(0.9, 20,problemList.get(i).getProblem()),
-		              //new SBXCrossover(1.0, 20.0),
+		              //new SMOCrossover(0.9, 20,problemList.get(i).getProblem()),
+		              new SBXCrossover(1.0, 20.0),
 		              new PolynomialMutation(1.0 / problemList.get(i).getProblem().getNumberOfVariables(), 20.0)).build();
 		      algorithms.add(new ExperimentAlgorithm<>(algorithm, problemList.get(i).getTag()));
 		    }

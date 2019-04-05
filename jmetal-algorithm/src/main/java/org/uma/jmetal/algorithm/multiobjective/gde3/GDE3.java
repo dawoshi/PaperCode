@@ -72,6 +72,9 @@ public class GDE3 extends AbstractDifferentialEvolution<List<DoubleSolution>> {
 
   @Override protected List<DoubleSolution> createInitialPopulation() {
     List<DoubleSolution> population = new ArrayList<>(getMaxPopulationSize());
+    
+    System.out.println("getproblem.getname():"+getProblem().getName()+"-------------------"+"populationsize():"+getMaxPopulationSize());
+    
     for (int i = 0; i < getMaxPopulationSize(); i++) {
       DoubleSolution newIndividual = getProblem().createSolution();
       population.add(newIndividual);

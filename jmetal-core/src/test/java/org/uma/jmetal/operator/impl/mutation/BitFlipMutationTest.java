@@ -169,6 +169,7 @@ public class BitFlipMutationTest {
       solution.setObjective(0, 0);
       solution.setObjective(1, 1);
     }
+
   }
   
   @Test

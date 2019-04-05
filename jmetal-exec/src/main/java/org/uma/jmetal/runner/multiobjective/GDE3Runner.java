@@ -8,6 +8,7 @@ import org.uma.jmetal.problem.DoubleProblem;
 import org.uma.jmetal.runner.AbstractAlgorithmRunner;
 import org.uma.jmetal.solution.DoubleSolution;
 import org.uma.jmetal.util.AlgorithmRunner;
+import org.uma.jmetal.util.Configure;
 import org.uma.jmetal.util.JMetalLogger;
 import org.uma.jmetal.util.ProblemUtils;
 import org.uma.jmetal.util.evaluator.impl.SequentialSolutionListEvaluator;
@@ -42,16 +43,18 @@ public class GDE3Runner extends AbstractAlgorithmRunner {
     } else {
       problemName = "org.uma.jmetal.problem.multiobjective.zdt.ZDT1";
       referenceParetoFront = "jmetal-problem/src/test/resources/pareto_fronts/ZDT1.pf";
+      referenceParetoFront ="D:/codes/guoxinian/jMetal/jmetal-problem/src/test/resources/pareto_fronts/ZDT1.pf";
+      Configure.setReferenceParetoFrontPath(referenceParetoFront);
+      Configure.setIndicationPath("GDE3.csv");
     }
 
     problem = (DoubleProblem) ProblemUtils.<DoubleSolution>loadProblem(problemName);
-
+    System.out.println("problem-name:"+problem.getName()+"-----------------------");
+    Configure.setproblem(problem.getName());
     double cr = 0.5;
     double f = 0.5;
     crossover = new DifferentialEvolutionCrossover(cr, f, "rand/1/bin");
-
     selection = new DifferentialEvolutionSelection();
-
     algorithm = new GDE3Builder(problem)
             .setCrossover(crossover)
             .setSelection(selection)

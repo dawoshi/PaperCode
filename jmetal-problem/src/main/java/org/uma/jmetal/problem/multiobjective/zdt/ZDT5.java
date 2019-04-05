@@ -122,4 +122,5 @@ public class ZDT5 extends AbstractBinaryProblem {
   private double u(BitSet bitset) {
     return bitset.cardinality() ;
   }
+
 }

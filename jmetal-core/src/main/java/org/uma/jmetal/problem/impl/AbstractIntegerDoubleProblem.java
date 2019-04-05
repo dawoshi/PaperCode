@@ -24,15 +24,6 @@ public abstract class AbstractIntegerDoubleProblem<S>
     return numberOfIntegerVariables;
   }
 
-	@Override
-	public Number getUpperBound(int index) {
-		return upperLimit.get(index);
-	}
-
-	@Override
-	public Number getLowerBound(int index) {
-		return lowerLimit.get(index);
-	}
 
   /* Setters */
   protected void setNumberOfDoubleVariables(int numberOfDoubleVariables) {

@@ -73,4 +73,17 @@ public class NMMin2 extends AbstractIntegerDoubleProblem<IntegerDoubleSolution> 
     solution.setObjective(0, approximationToN);
     solution.setObjective(1, approximationToM);
   }
+
+@Override
+public int getLowerBound(int index) {
+	// TODO Auto-generated method stub
+	return 0;
+}
+
+@Override
+public int getUpperBound(int index) {
+	// TODO Auto-generated method stub
+	return 0;
+}
+
 }

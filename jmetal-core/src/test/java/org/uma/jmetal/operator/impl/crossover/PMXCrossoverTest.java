@@ -36,7 +36,6 @@ public class PMXCrossoverTest {
 			public int getPermutationLength() {
 				return 10;
 			}
-
 		};
 		List<PermutationSolution<Integer>> parentSolutions = new LinkedList<>();
 		parentSolutions.add(problem.createSolution());

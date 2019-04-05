@@ -10,6 +10,7 @@ import org.uma.jmetal.problem.DoubleProblem;
 import org.uma.jmetal.runner.AbstractAlgorithmRunner;
 import org.uma.jmetal.solution.DoubleSolution;
 import org.uma.jmetal.util.AlgorithmRunner;
+import org.uma.jmetal.util.Configure;
 import org.uma.jmetal.util.JMetalLogger;
 import org.uma.jmetal.util.ProblemUtils;
 
@@ -33,7 +34,6 @@ public class MOEADRunner extends AbstractAlgorithmRunner {
     Algorithm<List<DoubleSolution>> algorithm;
     MutationOperator<DoubleSolution> mutation;
     DifferentialEvolutionCrossover crossover;
-
     String problemName ;
     String referenceParetoFront = "";
     if (args.length == 1) {
@@ -42,13 +42,12 @@ public class MOEADRunner extends AbstractAlgorithmRunner {
       problemName = args[0] ;
       referenceParetoFront = args[1] ;
     } else {
-      problemName = "org.uma.jmetal.problem.multiobjective.dtlz.DTLZ2";
-       referenceParetoFront ="D:/codes/guoxinian/jMetal/jmetal-problem/src/test/resources/pareto_fronts/DTLZ2.3D.pf";
+      //problemName = "org.uma.jmetal.problem.multiobjective.dtlz.DTLZ2";
       //referenceParetoFront = "jmetal-problem/src/test/resources/pareto_fronts/ZDT1.pf";
+       referenceParetoFront =Configure.getReferenceParetoFrontPath();
+       problemName = Configure.getproblem();
     }
-
     problem = (DoubleProblem)ProblemUtils.<DoubleSolution> loadProblem(problemName);
-
     double cr = 1.0 ;
     double f = 0.5 ;
     crossover = new DifferentialEvolutionCrossover(cr, f, "rand/1/bin");

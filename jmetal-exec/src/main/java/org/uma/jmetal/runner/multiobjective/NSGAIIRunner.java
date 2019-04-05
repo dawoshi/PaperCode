@@ -20,6 +20,7 @@ import org.uma.jmetal.problem.multiobjective.zdt.ZDT6;
 import org.uma.jmetal.runner.AbstractAlgorithmRunner;
 import org.uma.jmetal.solution.DoubleSolution;
 import org.uma.jmetal.util.AlgorithmRunner;
+import org.uma.jmetal.util.Configure;
 import org.uma.jmetal.util.JMetalException;
 import org.uma.jmetal.util.JMetalLogger;
 import org.uma.jmetal.util.OrthogonalTable;
@@ -58,10 +59,12 @@ public class NSGAIIRunner extends AbstractAlgorithmRunner {
     } else {
       problemName = "org.uma.jmetal.problem.multiobjective.dtlz.DTLZ2";
       referenceParetoFront ="D:/codes/guoxinian/jMetal/jmetal-problem/src/test/resources/pareto_fronts/DTLZ2.3D.pf";
+      Configure.setproblem("DTLZ2");
+      Configure.setReferenceParetoFrontPath(referenceParetoFront);
+      Configure.setIndicationPath("NSGAII.csv");
     }
 
     problem = ProblemUtils.<DoubleSolution> loadProblem(problemName);
-    
     double crossoverProbability = 0.9 ;
     double crossoverDistributionIndex = 20.0 ;
     crossover = new SBXCrossover(crossoverProbability, crossoverDistributionIndex) ;    
@@ -84,9 +87,7 @@ public class NSGAIIRunner extends AbstractAlgorithmRunner {
 
     List<DoubleSolution> population = algorithm.getResult() ;
     long computingTime = algorithmRunner.getComputingTime() ;
-
     JMetalLogger.logger.info("Total execution time: " + computingTime + "ms");
-
     printFinalSolutionSet(population);
     System.out.println(referenceParetoFront);
     System.out.println("last:indicators");

@@ -10,7 +10,7 @@ public class OrthogonalTable{
 	private static int rows; //行数
 	private static double threshold;
 	
-	public synchronized static int [][] getOrthogoanlTable(){
+	public  static synchronized int [][] getOrthogoanlTable(){
 		
 		int [][] res = new int[getRows()+1][getRows()+1];
 		
@@ -51,19 +51,19 @@ public class OrthogonalTable{
 		}
 		return tmp;	
 	}
-//	public static void main(String args[]){
-//		
-//		OrthogonalTable.setF(2);
-//		OrthogonalTable.setQ(3);
-//		System.out.println("rows"+OrthogonalTable.getRows());
-//		int [][] a= OrthogonalTable.getOrthogoanlTable();
-//		for(int i =0;i<a.length;i++){
-//			for(int j = 0;j<a[0].length;j++){
-//				System.out.print(a[i][j]+",");
-//			}
-//			System.out.println();
-//		}
-//	}
+	public static void main(String args[]){
+		
+		OrthogonalTable.setF(30);
+		OrthogonalTable.setQ(3);
+		System.out.println("rows"+OrthogonalTable.getRows());
+		int [][] a= OrthogonalTable.getOrthogoanlTable();
+		for(int i =0;i<a.length;i++){
+			for(int j = 0;j<a[0].length;j++){
+				System.out.print(a[i][j]+",");
+			}
+			System.out.println();
+		}
+	}
 
 	public static int getQ() {
 		return Q;

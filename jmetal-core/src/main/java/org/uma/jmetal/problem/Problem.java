@@ -17,6 +17,6 @@ public interface Problem<S> extends Serializable {
   String getName() ;
 
   /* Methods */
-  void evaluate(S solution) ;
-  S createSolution() ;
+  void evaluate(S solution);
+  S createSolution();
 }

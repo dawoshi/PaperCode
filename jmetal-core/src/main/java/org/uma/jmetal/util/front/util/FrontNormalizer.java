@@ -89,7 +89,10 @@ public class FrontNormalizer {
   }
 
   private Front getNormalizedFront(Front front, double[] maximumValues, double[] minimumValues) {
-   if (front.getNumberOfPoints() == 0) {
+   
+	  System.out.println("front.getPoint(0).getNumberOfDimensions():"+front.getPoint(0).getNumberOfDimensions());
+	  System.out.println("maximumValues.length:"+maximumValues.length);
+	  if (front.getNumberOfPoints() == 0) {
       throw new JMetalException("The front is empty") ;
     } else if (front.getPoint(0).getNumberOfDimensions() != maximumValues.length) {
       throw new JMetalException("The length of the point dimensions ("
